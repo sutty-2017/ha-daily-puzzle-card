@@ -68,6 +68,7 @@ class DailyPuzzleManager:
     def start_timers(self) -> None:
         @callback
         def _minute(_now):
+            self.hass.async_create_task(self.async_rollover())
             self.async_notify()
 
         @callback
