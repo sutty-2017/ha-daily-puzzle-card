@@ -1,78 +1,78 @@
 # Daily Puzzle for Home Assistant
 
-A shared daily puzzle integration and dashboard card for Home Assistant. Play one household puzzle each day, keep a shared streak, and automatically clear the game from the dashboard after it is solved.
+A shared daily puzzle integration and companion dashboard card for Home Assistant. One household puzzle is selected each day, progress is shared across dashboards, and Home Assistant entities expose completion and stats for your own automations and dashboard visibility rules.
 
-> **v0.1.0 preview:** installable for Home Assistant testing. The included puzzle bank is intentionally small while gameplay and state handling are validated.
+> **v0.1.0:** first installable community release.
 
 This project is experimental, intended for personal/community use, and developed with AI assistance.
 
 ## Included in v0.1.0
 
-- **Word Grid** — a five-letter daily word game
+- **Word Grid** — a five-letter daily word puzzle
 - **Four of a Kind** — find four groups of four related words
-- One shared game state across all Home Assistant dashboards
-- Persistent lifetime puzzles solved
-- Current daily streak
-- Best daily streak
-- Today's game and status sensors
-- Solved card remains visible for 10 minutes, then hides
-- Local puzzle selection; no API key or cloud puzzle service
+- Compact dashboard card that opens a large play popup
+- Minimize the popup and continue later
+- Shared, persistent progress across Home Assistant clients
+- Completed-board view after solving
+- **Replay today's puzzle** without changing the day's completion, streak, or total
+- Clear **Already completed today** indicator during replay
+- Current streak, best streak, and lifetime puzzles solved
+- Completed binary sensor for dashboard visibility and automations
+- Time-remaining sensor plus a smooth HH:MM:SS countdown on the card
+- Four customizable Four of a Kind group colors in the visual card editor
+- Bundled card is automatically served and registered by the integration
+- Local puzzle selection; no puzzle API, AI service, account, or API key required
 
 ## Installation
 
 ### HACS custom repository
 
-1. In HACS, add `https://github.com/sutty-2017/ha-daily-puzzle-card` as a **custom repository** with category **Integration**.
+1. In HACS, add this repository as a **custom repository** with category **Integration**.
 2. Install **Daily Puzzle**.
 3. Restart Home Assistant.
 4. Go to **Settings → Devices & services → Add integration** and search for **Daily Puzzle**.
 5. Add it once.
+6. Add the **Daily Puzzle** card from the dashboard card picker.
 
-### Dashboard resource
+The integration bundles and registers its Lovelace card automatically. A manual Dashboard Resource is not normally required.
 
-The integration serves its card JavaScript locally. In **Settings → Dashboards → Resources**, add:
+### Manual card YAML
 
-```
-/daily_puzzle/daily-puzzle-card.js
-```
+    type: custom:daily-puzzle-card
 
-Set the resource type to **JavaScript Module**, then refresh the browser/app.
-
-### Add the card
-
-Add a Manual card with:
-
-```yaml
-type: custom:daily-puzzle-card
-```
-
-Optional:
-
-```yaml
-type: custom:daily-puzzle-card
-title: Daily Puzzle
-hide_after: 600
-```
-
-`hide_after` is in seconds.
+The visual editor also lets you change the card title and the four solved-group colors.
 
 ## Entities
 
-The integration creates sensors for:
+Daily Puzzle creates:
 
-- Daily Puzzle Status
-- Daily Puzzle Daily streak
-- Daily Puzzle Best daily streak
-- Daily Puzzle Puzzles solved
-- Daily Puzzle Today's game
+- **Completed** — binary sensor; ON once today's puzzle has been completed
+- **Status** — current play state and shared board data
+- **Today's game**
+- **Time remaining** — time until the next daily puzzle; includes the exact next-puzzle timestamp
+- **Daily streak**
+- **Best daily streak**
+- **Puzzles solved**
 
-The Status sensor also contains today's shared game state and completion timestamp as attributes.
+The Completed sensor intentionally stays ON after Replay. Replay resets only the playable board; it does not erase the day's completion or award stats a second time.
+
+## Dashboard visibility
+
+Daily Puzzle does not hide itself after completion. Use Home Assistant's normal card **Visibility** conditions with the Completed binary sensor if you want the card hidden, shown, or conditionally displayed after solving.
+
+This keeps presentation policy in Home Assistant: another household may prefer to leave the completed board available all day.
 
 ## How daily puzzles work
 
-The integration assigns the game type by day. Puzzle content is bundled locally with the card and selected deterministically from the date, so everyone using the same version receives the same daily puzzle. Progress is stored by the integration in Home Assistant storage, not in an individual browser.
+The integration chooses the game and bundled puzzle deterministically from Home Assistant's local date. The backend owns puzzle answers, validation, shared progress, daily rollover, completion, and statistics. The card is the presentation layer.
 
-The current v0.1.0 bank is for functional testing. Expanding and curating the puzzle library is a priority before calling the project stable.
+The card's countdown animates once per second in the browser, while the Home Assistant time-remaining entity updates at a much lower rate. This avoids unnecessary recorder/state traffic just to animate seconds.
+
+## Replay behavior
+
+After the first solve, the original completed board is retained. Pressing **Replay today's puzzle** starts the same daily puzzle again and displays an **Already completed today** indicator.
+
+Replay never turns the Completed sensor back off, removes the original completion, increments Puzzles solved again, or changes the day's streak credit.
 
 ## Privacy and network use
 
