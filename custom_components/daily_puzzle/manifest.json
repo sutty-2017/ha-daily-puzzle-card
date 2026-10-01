@@ -1,0 +1,13 @@
+{
+  "domain": "daily_puzzle",
+  "name": "Daily Puzzle",
+  "version": "0.1.0",
+  "documentation": "https://github.com/sutty-2017/ha-daily-puzzle-card",
+  "issue_tracker": "https://github.com/sutty-2017/ha-daily-puzzle-card/issues",
+  "codeowners": [
+    "@sutty-2017"
+  ],
+  "config_flow": true,
+  "integration_type": "service",
+  "iot_class": "calculated"
+}
