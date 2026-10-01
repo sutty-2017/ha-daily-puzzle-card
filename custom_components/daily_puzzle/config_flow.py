@@ -86,7 +86,7 @@ class DailyPuzzleOptionsFlow(config_entries.OptionsFlowWithReload):
             manager = self.hass.data.get(DOMAIN, {}).get(self.config_entry.entry_id)
             if manager:
                 await manager.async_reset_today()
-            return self.async_create_entry(title="", data=dict(self.config_entry.options))
+            return self.async_abort(reason="reset_today_complete")
         return self.async_show_form(
             step_id="reset_today",
             data_schema=vol.Schema({vol.Required("confirm", default=False): bool}),
@@ -105,7 +105,7 @@ class DailyPuzzleOptionsFlow(config_entries.OptionsFlowWithReload):
             manager = self.hass.data.get(DOMAIN, {}).get(self.config_entry.entry_id)
             if manager:
                 await manager.async_reset_all()
-            return self.async_create_entry(title="", data=dict(self.config_entry.options))
+            return self.async_abort(reason="reset_all_complete")
         return self.async_show_form(
             step_id="reset_all",
             data_schema=vol.Schema({vol.Required("confirm", default=False): bool}),
