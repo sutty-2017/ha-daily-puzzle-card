@@ -1,24 +1,24 @@
-update_game:
-  name: Update game
-  description: Store shared progress for today's Daily Puzzle.
+submit_word:
+  name: Submit word
+  description: Submit a five-letter guess for today's Word Grid.
   fields:
-    game:
-      name: Game
+    guess:
+      name: Guess
       required: true
+      example: CRANE
       selector:
         text:
-    status:
-      name: Status
+
+submit_group:
+  name: Submit group
+  description: Submit four selected words for today's Four of a Kind.
+  fields:
+    words:
+      name: Words
       required: true
       selector:
-        select:
-          options:
-            - not_started
-            - in_progress
-            - solved
-            - failed
-    game_state:
-      name: Game state
-      required: false
-      selector:
         object:
+
+replay:
+  name: Replay today's puzzle
+  description: Reset the playable board for today without changing completion status, streaks, or totals.
