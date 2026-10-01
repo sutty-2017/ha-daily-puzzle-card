@@ -53,6 +53,9 @@ class DailyPuzzleSensor(SensorEntity):
                 "test_mode": self.manager.state.get("test_mode", False),
                 "admin_mode": self.manager.admin_mode,
                 "enabled_games": self.manager.enabled_games,
+                "hints_enabled": self.manager.hints_enabled,
+                "group_mistakes": self.manager.group_mistakes,
+                "credit_lost": self.manager.state.get("credit_lost", False),
             }
         if self.key == "time_remaining":
             return {

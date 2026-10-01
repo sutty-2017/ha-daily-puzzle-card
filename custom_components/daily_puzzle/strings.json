@@ -41,10 +41,12 @@
     "step": {
       "init": {
         "title": "Daily Puzzle options",
-        "description": "Choose which games can appear in the daily pool and optionally enable Admin/Test Mode.",
+        "description": "Choose the daily game pool and gameplay options. Changes apply to future daily puzzles; Admin/Test Mode is for unlimited testing.",
         "data": {
           "enabled_games": "Enabled games",
-          "admin_mode": "Admin/Test Mode"
+          "admin_mode": "Admin/Test Mode",
+          "hints_enabled": "Enable hints",
+          "group_mistakes": "Four of a Kind allowed mistakes"
         }
       }
     },

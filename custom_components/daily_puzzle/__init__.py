@@ -17,7 +17,7 @@ from homeassistant.helpers.event import async_track_time_interval, async_track_u
 from homeassistant.helpers.storage import Store
 from homeassistant.util import dt as dt_util
 
-from .const import (CONF_ADMIN_MODE, CONF_ENABLED_GAMES, DEFAULT_ENABLED_GAMES, DOMAIN, GAME_NAMES, PLATFORMS, STORAGE_KEY, STORAGE_VERSION)
+from .const import (CONF_ADMIN_MODE, CONF_ENABLED_GAMES, CONF_GROUP_MISTAKES, CONF_HINTS_ENABLED, DEFAULT_ENABLED_GAMES, DEFAULT_GROUP_MISTAKES, DOMAIN, GAME_NAMES, PLATFORMS, STORAGE_KEY, STORAGE_VERSION)
 from .puzzles import game_for_date, groups_for_date, word_for_date
 
 _LOGGER = logging.getLogger(__name__)
@@ -66,6 +66,11 @@ class DailyPuzzleManager:
         self.state.setdefault("replay_mode", False)
         self.state.setdefault("test_mode", False)
         self.state.setdefault("daily_snapshot", None)
+        self.state.setdefault("credit_lost", False)
+        if self.state.get("test_mode") and not self.admin_mode and self.state.get("daily_snapshot"):
+            self.state.update(self.state["daily_snapshot"])
+            self.state["test_mode"] = False
+            self.state["daily_snapshot"] = None
         await self.async_rollover()
 
     def start_timers(self) -> None:
@@ -95,6 +100,14 @@ class DailyPuzzleManager:
     def admin_mode(self) -> bool:
         return bool(self.entry.options.get(CONF_ADMIN_MODE, False))
 
+    @property
+    def hints_enabled(self) -> bool:
+        return bool(self.entry.options.get(CONF_HINTS_ENABLED, True))
+
+    @property
+    def group_mistakes(self) -> int:
+        return max(1, int(self.entry.options.get(CONF_GROUP_MISTAKES, DEFAULT_GROUP_MISTAKES)))
+
     def _new_game_state(self, game: str, day: date) -> dict:
         return {}
 
@@ -109,7 +122,7 @@ class DailyPuzzleManager:
         self.state.update({
             "date": today, "status": "not_started", "game": game_for_date(today_date, self.enabled_games),
             "game_state": self._new_game_state(game_for_date(today_date, self.enabled_games), today_date), "completed": False, "completed_at": None,
-            "completed_board": None, "replay_mode": False, "test_mode": False, "daily_snapshot": None,
+            "completed_board": None, "replay_mode": False, "test_mode": False, "daily_snapshot": None, "credit_lost": False,
         })
         await self.async_save()
 
@@ -143,14 +156,19 @@ class DailyPuzzleManager:
         guesses.append({"word": guess, "score": _word_score(answer, guess)})
         game_state["guesses"] = guesses
         self.state["game_state"] = game_state
-        self.state["status"] = "solved" if guess == answer else "in_progress"
         if guess == answer:
+            self.state["status"] = "solved"
             await self._async_complete()
+        elif len(guesses) >= 6:
+            self.state["status"] = "failed"
+            self._mark_failed_attempt()
+        else:
+            self.state["status"] = "in_progress"
         await self.async_save()
 
     async def async_submit_group(self, words: list[str]) -> None:
         await self.async_rollover()
-        if self.state["game"] != "four_of_a_kind" or self.state["status"] == "solved":
+        if self.state["game"] != "four_of_a_kind" or self.state["status"] in ("solved", "failed"):
             return
         selected = {str(word).strip().upper() for word in words}
         if len(selected) != 4:
@@ -162,9 +180,15 @@ class DailyPuzzleManager:
         solved_words = {word for group in solved for word in group["words"]}
         match = next((g for g in groups if set(g["words"]) == selected and not selected <= solved_words), None)
         if not match:
+            mistakes = int(game_state.get("mistakes", 0)) + 1
+            game_state["mistakes"] = mistakes
             game_state["last_result"] = "incorrect"
             self.state["game_state"] = game_state
-            self.state["status"] = "in_progress"
+            if mistakes >= self.group_mistakes:
+                self.state["status"] = "failed"
+                self._mark_failed_attempt()
+            else:
+                self.state["status"] = "in_progress"
             await self.async_save()
             return
         solved.append({"label": match["label"], "words": list(match["words"])})
@@ -176,15 +200,23 @@ class DailyPuzzleManager:
             await self._async_complete()
         await self.async_save()
 
+    def _mark_failed_attempt(self) -> None:
+        if self.state.get("test_mode") or self.state.get("replay_mode") or self.state.get("completed"):
+            return
+        self.state["credit_lost"] = True
+        self.state["streak"] = 0
+
     async def _async_complete(self) -> None:
         if self.state.get("test_mode") or self.state.get("completed"):
+            return
+        self.state["completed"] = True
+        self.state["completed_at"] = dt_util.now().isoformat()
+        self.state["completed_board"] = json.loads(json.dumps(self.state.get("game_state") or {}))
+        if self.state.get("credit_lost") or self.state.get("replay_mode"):
             return
         today = dt_util.now().date()
         last_raw = self.state.get("last_solved_date")
         last = date.fromisoformat(last_raw) if last_raw else None
-        self.state["completed"] = True
-        self.state["completed_at"] = dt_util.now().isoformat()
-        self.state["completed_board"] = json.loads(json.dumps(self.state.get("game_state") or {}))
         self.state["streak"] = self.state.get("streak", 0) + 1 if last == today - timedelta(days=1) else 1
         self.state["best_streak"] = max(self.state.get("best_streak", 0), self.state["streak"])
         self.state["puzzles_solved"] = self.state.get("puzzles_solved", 0) + 1
@@ -193,7 +225,7 @@ class DailyPuzzleManager:
     def _capture_daily_snapshot(self) -> None:
         if self.state.get("test_mode") or self.state.get("daily_snapshot"):
             return
-        keys = ("game", "game_state", "status", "completed", "completed_at", "completed_board", "replay_mode")
+        keys = ("game", "game_state", "status", "completed", "completed_at", "completed_board", "replay_mode", "credit_lost")
         self.state["daily_snapshot"] = {key: json.loads(json.dumps(self.state.get(key))) for key in keys}
 
     async def async_admin_reset(self) -> None:
@@ -242,11 +274,69 @@ class DailyPuzzleManager:
             self.state["status"] = "not_started"
             await self.async_save()
             return
-        if not self.state.get("completed"):
+        if self.state.get("status") not in ("solved", "failed") and not self.state.get("completed"):
             return
         self.state["game_state"] = {}
         self.state["status"] = "not_started"
         self.state["replay_mode"] = True
+        await self.async_save()
+
+
+    async def async_use_hint(self) -> None:
+        await self.async_rollover()
+        if not self.hints_enabled or self.state.get("status") in ("solved", "failed"):
+            return
+        day = date.fromisoformat(self.state["date"])
+        game_state = dict(self.state.get("game_state") or {})
+        if self.state["game"] == "word_grid":
+            answer = word_for_date(day)
+            guesses = list(game_state.get("guesses") or [])
+            found = {
+                char
+                for guess in guesses
+                for char, score in zip(guess["word"], guess["score"])
+                if score in ("present", "correct")
+            }
+            hinted = list(game_state.get("hint_letters") or [])
+            found.update(hinted)
+            vowels = set("AEIOU")
+            consonants = [c for c in answer if c not in vowels and c not in found]
+            vowel_letters = [c for c in answer if c in vowels and c not in found]
+            used_types = list(game_state.get("hint_types") or [])
+            if "consonant" not in used_types and consonants:
+                hinted.append(consonants[0])
+                used_types.append("consonant")
+            elif "vowel" not in used_types and vowel_letters:
+                hinted.append(vowel_letters[0])
+                used_types.append("vowel")
+            else:
+                return
+            game_state["hint_letters"] = hinted
+            game_state["hint_types"] = used_types
+        elif self.state["game"] == "four_of_a_kind":
+            groups = groups_for_date(day)
+            solved_words = {word for group in game_state.get("solved_groups", []) for word in group["words"]}
+            pairs = list(game_state.get("hint_pairs") or [])
+            hinted_group_indexes = list(game_state.get("hint_group_indexes") or [])
+            candidate = None
+            candidate_index = None
+            for index, group in enumerate(groups):
+                available = [word for word in group["words"] if word not in solved_words]
+                if index not in hinted_group_indexes and len(available) >= 2:
+                    candidate = available[:2]
+                    candidate_index = index
+                    break
+            if not candidate or len(pairs) >= 2:
+                return
+            pairs.append(candidate)
+            hinted_group_indexes.append(candidate_index)
+            game_state["hint_pairs"] = pairs
+            game_state["hint_group_indexes"] = hinted_group_indexes
+        else:
+            return
+        self.state["game_state"] = game_state
+        if self.state["status"] == "not_started":
+            self.state["status"] = "in_progress"
         await self.async_save()
 
     async def async_save(self) -> None:
@@ -291,12 +381,16 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     async def return_to_daily(call: ServiceCall) -> None:
         await manager.async_return_to_daily()
 
+    async def use_hint(call: ServiceCall) -> None:
+        await manager.async_use_hint()
+
     hass.services.async_register(DOMAIN, "submit_word", submit_word, schema=vol.Schema({vol.Required("guess"): cv.string}))
     hass.services.async_register(DOMAIN, "submit_group", submit_group, schema=vol.Schema({vol.Required("words"): vol.All(cv.ensure_list, [cv.string])}))
     hass.services.async_register(DOMAIN, "replay", replay)
     hass.services.async_register(DOMAIN, "admin_reset", admin_reset)
     hass.services.async_register(DOMAIN, "admin_switch_game", admin_switch_game, schema=vol.Schema({vol.Required("game"): vol.In(GAME_NAMES)}))
     hass.services.async_register(DOMAIN, "return_to_daily", return_to_daily)
+    hass.services.async_register(DOMAIN, "use_hint", use_hint)
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     hass.async_create_task(_async_register_frontend(hass))
@@ -309,7 +403,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         if manager:
             manager.stop_timers()
         hass.data.pop(DATA_KEY, None)
-        for service in ("submit_word", "submit_group", "replay", "admin_reset", "admin_switch_game", "return_to_daily"):
+        for service in ("submit_word", "submit_group", "replay", "admin_reset", "admin_switch_game", "return_to_daily", "use_hint"):
             hass.services.async_remove(DOMAIN, service)
     return unloaded
 
