@@ -1,4 +1,5 @@
-const sh=(a,s)=>{a=[...a];let x=s||1;for(let i=a.length-1;i>0;i--){x=(x*1664525+1013904223)>>>0;let j=x%(i+1);[a[i],a[j]]=[a[j],a[i]]}return a};\nconst D={title:"Daily Puzzle",group_1_color:"#f9df6d",group_2_color:"#a0c35a",group_3_color:"#b0c4ef",group_4_color:"#ba81c5"};
+const sh=(a,s)=>{a=[...a];let x=s||1;for(let i=a.length-1;i>0;i--){x=(x*1664525+1013904223)>>>0;let j=x%(i+1);[a[i],a[j]]=[a[j],a[i]]}return a};
+const D={title:"Daily Puzzle",group_1_color:"#f9df6d",group_2_color:"#a0c35a",group_3_color:"#b0c4ef",group_4_color:"#ba81c5"};
 class DailyPuzzleEditor extends HTMLElement{
  setConfig(c){this.c=Object.assign({},D,c);this.r()} set hass(h){}
  r(){if(!this.c)return;this.innerHTML='<div style="display:grid;gap:12px"><label>Title <input id="t" value="'+this.c.title+'" style="width:100%"></label><small>Solved groups use these colors in order.</small>'+[1,2,3,4].map(i=>'<label style="display:flex;justify-content:space-between">Group '+i+' color <input type="color" data-k="group_'+i+'_color" value="'+this.c['group_'+i+'_color']+'"></label>').join("")+'</div>';this.querySelector("#t").onchange=e=>this.ch("title",e.target.value);this.querySelectorAll("[data-k]").forEach(x=>x.oninput=e=>this.ch(e.target.dataset.k,e.target.value))}
