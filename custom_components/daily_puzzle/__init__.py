@@ -341,7 +341,7 @@ class DailyPuzzleManager:
     def _capture_daily_snapshot(self) -> None:
         if self.state.get("test_mode") or self.state.get("daily_snapshot"):
             return
-        keys = ("game", "game_state", "status", "completed", "completed_at", "completed_board", "replay_mode", "credit_lost")
+        keys = ("game", "game_state", "status", "completed", "completed_at", "completed_board", "replay_mode", "credit_lost", "streak", "best_streak", "puzzles_solved", "no_hint_solves", "last_solved_date", "today_credit")
         self.state["daily_snapshot"] = {key: json.loads(json.dumps(self.state.get(key))) for key in keys}
 
     async def async_reset_today(self) -> None:
