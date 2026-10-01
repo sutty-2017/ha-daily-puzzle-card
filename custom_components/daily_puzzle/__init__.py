@@ -17,7 +17,7 @@ from homeassistant.helpers.event import async_track_time_interval, async_track_u
 from homeassistant.helpers.storage import Store
 from homeassistant.util import dt as dt_util
 
-from .const import (CONF_ADMIN_MODE, CONF_ENABLED_GAMES, CONF_GROUP_MISTAKES, CONF_HINTS_ENABLED, DEFAULT_ENABLED_GAMES, DEFAULT_GROUP_MISTAKES, DOMAIN, GAME_NAMES, PLATFORMS, STORAGE_KEY, STORAGE_VERSION)
+from .const import (CONF_ADMIN_MODE, CONF_ENABLED_GAMES, CONF_GROUP_MISTAKES, CONF_HINTS_ENABLED, CONF_WORD_LENGTH, DEFAULT_ENABLED_GAMES, DEFAULT_GROUP_MISTAKES, DEFAULT_WORD_LENGTH, DOMAIN, GAME_NAMES, PLATFORMS, STORAGE_KEY, STORAGE_VERSION)
 from .puzzles import game_for_date, groups_for_date, word_for_date
 
 _LOGGER = logging.getLogger(__name__)
@@ -123,8 +123,16 @@ class DailyPuzzleManager:
     def group_mistakes(self) -> int:
         return max(1, int(self.entry.options.get(CONF_GROUP_MISTAKES, DEFAULT_GROUP_MISTAKES)))
 
+    @property
+    def word_length(self) -> int:
+        return max(3, min(7, int(self.entry.options.get(CONF_WORD_LENGTH, DEFAULT_WORD_LENGTH))))
+
     def _new_game_state(self, game: str, day: date) -> dict:
-        return {"mistake_limit": self.group_mistakes} if game == "four_of_a_kind" else {}
+        if game == "four_of_a_kind":
+            return {"mistake_limit": self.group_mistakes}
+        if game == "word_grid":
+            return {"word_length": self.word_length}
+        return {}
 
     async def async_rollover(self) -> None:
         today_date = dt_util.now().date()
@@ -162,7 +170,6 @@ class DailyPuzzleManager:
             )
         elif self.state["game"] == "word_grid":
             length = int(data.get("word_length") or 0)
-            data["word_lengths"] = [3, 4, 5, 6, 7]
             if length:
                 answer = word_for_date(day, length)
                 found = {char for guess in data.get("guesses", []) for char, score in zip(guess["word"], guess["score"]) if score in ("present", "correct")}
@@ -204,19 +211,6 @@ class DailyPuzzleManager:
             self._mark_failed_attempt()
         else:
             self.state["status"] = "in_progress"
-        await self.async_save()
-
-    async def async_select_word_length(self, length: int) -> None:
-        await self.async_rollover()
-        if self.state["game"] != "word_grid" or self.state["status"] != "not_started":
-            return
-        length = int(length)
-        if length not in (3, 4, 5, 6, 7):
-            return
-        game_state = dict(self.state.get("game_state") or {})
-        game_state["word_length"] = length
-        game_state.setdefault("guesses", [])
-        self.state["game_state"] = game_state
         await self.async_save()
 
     async def async_submit_group(self, words: list[str]) -> None:
@@ -435,9 +429,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     async def submit_word(call: ServiceCall) -> None:
         await manager.async_submit_word(call.data["guess"])
 
-    async def select_word_length(call: ServiceCall) -> None:
-        await manager.async_select_word_length(call.data["length"])
-
     async def submit_group(call: ServiceCall) -> None:
         await manager.async_submit_group(call.data["words"])
 
@@ -457,7 +448,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         await manager.async_use_hint()
 
     hass.services.async_register(DOMAIN, "submit_word", submit_word, schema=vol.Schema({vol.Required("guess"): cv.string}))
-    hass.services.async_register(DOMAIN, "select_word_length", select_word_length, schema=vol.Schema({vol.Required("length"): vol.All(vol.Coerce(int), vol.In([3, 4, 5, 6, 7]))}))
     hass.services.async_register(DOMAIN, "submit_group", submit_group, schema=vol.Schema({vol.Required("words"): vol.All(cv.ensure_list, [cv.string])}))
     hass.services.async_register(DOMAIN, "replay", replay)
     hass.services.async_register(DOMAIN, "admin_reset", admin_reset)
@@ -476,7 +466,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         if manager:
             manager.stop_timers()
         hass.data.pop(DATA_KEY, None)
-        for service in ("submit_word", "select_word_length", "submit_group", "replay", "admin_reset", "admin_switch_game", "return_to_daily", "use_hint"):
+        for service in ("submit_word", "submit_group", "replay", "admin_reset", "admin_switch_game", "return_to_daily", "use_hint"):
             hass.services.async_remove(DOMAIN, service)
     return unloaded
 
