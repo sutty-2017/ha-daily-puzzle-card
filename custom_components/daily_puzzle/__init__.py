@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-from datetime import date, datetime, timedelta
-import json
+from datetime import date, timedelta
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, ServiceCall, callback
-from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.storage import Store
 from homeassistant.components.http import StaticPathConfig
+from homeassistant.util import dt as dt_util
 
 from .const import DOMAIN, PLATFORMS, STORAGE_KEY, STORAGE_VERSION
 
@@ -36,13 +35,13 @@ class DailyPuzzleManager:
         await self.async_rollover()
 
     async def async_rollover(self) -> None:
-        today = date.today().isoformat()
+        today = dt_util.now().date().isoformat()
         if self.state.get("date") == today:
             return
         self.state.update({
             "date": today,
             "status": "not_started",
-            "game": "four_of_a_kind" if date.today().toordinal() % 2 else "word_grid",
+            "game": "four_of_a_kind" if dt_util.now().date().toordinal() % 2 else "word_grid",
             "game_state": {},
             "completed_at": None,
         })
@@ -65,14 +64,14 @@ class DailyPuzzleManager:
         self.state["game_state"] = game_state
         self.state["status"] = status
         if status == "solved" and not was_solved:
-            today = date.today()
+            today = dt_util.now().date()
             last_raw = self.state.get("last_solved_date")
             last = date.fromisoformat(last_raw) if last_raw else None
             self.state["streak"] = self.state.get("streak", 0) + 1 if last == today - timedelta(days=1) else 1
             self.state["best_streak"] = max(self.state.get("best_streak", 0), self.state["streak"])
             self.state["puzzles_solved"] = self.state.get("puzzles_solved", 0) + 1
             self.state["last_solved_date"] = today.isoformat()
-            self.state["completed_at"] = datetime.now().astimezone().isoformat()
+            self.state["completed_at"] = dt_util.now().isoformat()
         await self.async_save()
 
 
