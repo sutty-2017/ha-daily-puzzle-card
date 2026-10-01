@@ -181,8 +181,13 @@ class DailyPuzzleManager:
             data["letters"] = puzzle["letters"]
             data["clue"] = puzzle["clue"]
             data["word_count"] = len(puzzle["words"])
+            found_set = set(data.get("found_words") or [])
+            data["found_paths"] = [
+                {"path": item["path"], "thread": bool(item["thread"])}
+                for item in puzzle["words"] if item["word"] in found_set
+            ]
             data["thread_found"] = any(
-                item["thread"] and item["word"] in set(data.get("found_words") or [])
+                item["thread"] and item["word"] in found_set
                 for item in puzzle["words"]
             )
             data["hint_available"] = len(data.get("hint_cells") or []) < 2 and any(
