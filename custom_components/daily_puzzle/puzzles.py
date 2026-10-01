@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from itertools import combinations
+
 from .const import DEFAULT_ENABLED_GAMES
 
 WORD_PUZZLES = {
@@ -102,19 +104,15 @@ GROUP_PUZZLES = [
 # Each board contains four categories and is rejected if any answer appears twice.
 _GROUP_SOURCE = [group for board in GROUP_PUZZLES for group in board]
 _GROUP_BOARDS = []
-_seen_group_boards = set()
-_seed = 0
-while len(_GROUP_BOARDS) < 100 and _seed < 10000:
-    picks = [(_seed * 7 + step * 13 + step * step * 3) % len(_GROUP_SOURCE) for step in range(4)]
-    groups = [_GROUP_SOURCE[index] for index in picks]
+for indexes in combinations(range(len(_GROUP_SOURCE)), 4):
+    groups = [_GROUP_SOURCE[index] for index in indexes]
     words = [word for group in groups for word in group["words"]]
-    signature = tuple(sorted(group["label"] + ":" + ",".join(group["words"]) for group in groups))
-    if len(set(picks)) == 4 and len(words) == 16 and len(set(words)) == 16 and signature not in _seen_group_boards:
-        _seen_group_boards.add(signature)
+    if len(words) == 16 and len(set(words)) == 16:
         _GROUP_BOARDS.append(groups)
-    _seed += 1
-if len(_GROUP_BOARDS) >= 100:
-    GROUP_PUZZLES = _GROUP_BOARDS[:100]
+        if len(_GROUP_BOARDS) == 100:
+            break
+if len(_GROUP_BOARDS) == 100:
+    GROUP_PUZZLES = _GROUP_BOARDS
 
 # Word Weave boards use a 6x6 grid. Answers are arranged as adjacent paths;
 # every cell belongs to exactly one answer, and the Theme Thread spans top to bottom.
