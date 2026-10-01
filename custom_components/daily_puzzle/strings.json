@@ -12,21 +12,15 @@
   },
   "entity": {
     "sensor": {
-      "status": {
-        "name": "Status"
-      },
-      "streak": {
-        "name": "Daily streak"
-      },
-      "best_streak": {
-        "name": "Best daily streak"
-      },
-      "puzzles_solved": {
-        "name": "Puzzles solved"
-      },
-      "game": {
-        "name": "Today's game"
-      }
+      "status": {"name": "Status"},
+      "streak": {"name": "Daily streak"},
+      "best_streak": {"name": "Best daily streak"},
+      "puzzles_solved": {"name": "Puzzles solved"},
+      "game": {"name": "Today's game"},
+      "time_remaining": {"name": "Time remaining"}
+    },
+    "binary_sensor": {
+      "completed": {"name": "Completed"}
     }
   }
 }
