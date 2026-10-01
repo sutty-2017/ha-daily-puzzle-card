@@ -65,6 +65,7 @@ class DailyPuzzleManager:
         self.state.setdefault("completed_board", None)
         self.state.setdefault("replay_mode", False)
         self.state.setdefault("test_mode", False)
+        self.state.setdefault("daily_snapshot", None)
         await self.async_rollover()
 
     def start_timers(self) -> None:
@@ -108,7 +109,7 @@ class DailyPuzzleManager:
         self.state.update({
             "date": today, "status": "not_started", "game": game_for_date(today_date, self.enabled_games),
             "game_state": self._new_game_state(game_for_date(today_date, self.enabled_games), today_date), "completed": False, "completed_at": None,
-            "completed_board": None, "replay_mode": False, "test_mode": False,
+            "completed_board": None, "replay_mode": False, "test_mode": False, "daily_snapshot": None,
         })
         await self.async_save()
 
@@ -189,10 +190,17 @@ class DailyPuzzleManager:
         self.state["puzzles_solved"] = self.state.get("puzzles_solved", 0) + 1
         self.state["last_solved_date"] = today.isoformat()
 
+    def _capture_daily_snapshot(self) -> None:
+        if self.state.get("test_mode") or self.state.get("daily_snapshot"):
+            return
+        keys = ("game", "game_state", "status", "completed", "completed_at", "completed_board", "replay_mode")
+        self.state["daily_snapshot"] = {key: json.loads(json.dumps(self.state.get(key))) for key in keys}
+
     async def async_admin_reset(self) -> None:
         await self.async_rollover()
         if not self.admin_mode:
             return
+        self._capture_daily_snapshot()
         self.state["game_state"] = {}
         self.state["status"] = "not_started"
         self.state["test_mode"] = True
@@ -202,6 +210,7 @@ class DailyPuzzleManager:
         await self.async_rollover()
         if not self.admin_mode or game not in GAME_NAMES:
             return
+        self._capture_daily_snapshot()
         self.state["game"] = game
         self.state["game_state"] = {}
         self.state["status"] = "not_started"
@@ -212,13 +221,18 @@ class DailyPuzzleManager:
         await self.async_rollover()
         if not self.admin_mode:
             return
-        today = dt_util.now().date()
-        game = game_for_date(today, self.enabled_games)
-        self.state["game"] = game
-        self.state["game_state"] = {}
-        self.state["status"] = "not_started"
+        snapshot = self.state.get("daily_snapshot")
+        if snapshot:
+            self.state.update(snapshot)
+        else:
+            today = dt_util.now().date()
+            game = game_for_date(today, self.enabled_games)
+            self.state["game"] = game
+            self.state["game_state"] = {}
+            self.state["status"] = "not_started"
+            self.state["replay_mode"] = False
         self.state["test_mode"] = False
-        self.state["replay_mode"] = False
+        self.state["daily_snapshot"] = None
         await self.async_save()
 
     async def async_replay(self) -> None:
