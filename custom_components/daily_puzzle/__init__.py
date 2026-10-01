@@ -72,10 +72,12 @@ class DailyPuzzleManager:
         # or completed board instead of forcing a new length choice on upgrade.
         if self.state.get("game") == "word_grid":
             game_state = dict(self.state.get("game_state") or {})
-            if not game_state.get("word_length") and (
-                game_state.get("guesses") or self.state.get("status") in ("in_progress", "solved", "failed")
-            ):
-                game_state["word_length"] = 5
+            if not game_state.get("word_length"):
+                # Existing v0.2.1 active boards were five letters. An untouched
+                # v0.2.2 board can safely adopt the configured length on upgrade.
+                game_state["word_length"] = 5 if (
+                    game_state.get("guesses") or self.state.get("status") in ("in_progress", "solved", "failed")
+                ) else self.word_length
                 self.state["game_state"] = game_state
             completed_board = self.state.get("completed_board")
             if isinstance(completed_board, dict) and completed_board.get("guesses") and not completed_board.get("word_length"):
