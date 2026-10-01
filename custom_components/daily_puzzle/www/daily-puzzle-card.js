@@ -41,7 +41,7 @@ class DailyPuzzleCard extends HTMLElement {
       .row{display:flex;gap:6px;justify-content:center;margin:6px 0}.letter{width:42px;height:42px;display:grid;place-items:center;border:2px solid var(--divider-color);font-weight:800;font-size:20px}.correct{background:#538d4e;color:white;border-color:#538d4e}.present{background:#b59f3b;color:white;border-color:#b59f3b}.absent{background:#3a3a3c;color:white;border-color:#3a3a3c}
       input{box-sizing:border-box;width:100%;font-size:18px;padding:12px;text-transform:uppercase;background:var(--card-background-color);color:var(--primary-text-color);border:1px solid var(--divider-color);border-radius:10px}.msg{text-align:center;margin:12px 0;font-weight:600}.solved{padding:18px;text-align:center;font-size:18px}
     </style><div class="wrap"><div class="head"><div class="title">${this.config.title}</div><div class="stats">🔥 ${this._hass.states["sensor.daily_puzzle_daily_streak"]?.state??0} · 🏆 ${this._hass.states["sensor.daily_puzzle_best_daily_streak"]?.state??0}</div></div><div id="game"></div></div></ha-card>`;
-    if(s?.state==="solved"){this.querySelector("#game").innerHTML='<div class="solved">🎉 Today’s puzzle solved!<br><small>This card will disappear shortly.</small></div>';return;}
+    if(s?.state==="solved"){this.querySelector("#game").innerHTML='<div class="solved">🎉 Today’s puzzle solved!<br><small>This card will disappear shortly.</small></div>';const elapsed=Date.now()-new Date(s.attributes.completed_at).getTime();const wait=Math.max(0,this.config.hide_after*1000-elapsed);clearTimeout(this._hideTimer);this._hideTimer=setTimeout(()=>this.render(),wait+50);return;}
     game==="word_grid"?this.renderWord(state):this.renderGroups(state);
   }
   renderWord(state){
