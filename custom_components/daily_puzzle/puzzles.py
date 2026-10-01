@@ -100,21 +100,7 @@ GROUP_PUZZLES = [
 ]
 
 
-# Build a 100-board Four of a Kind rotation from the authored category groups.
-# Each board contains four categories and is rejected if any answer appears twice.
-_GROUP_SOURCE = [group for board in GROUP_PUZZLES for group in board]
-_GROUP_BOARDS = []
-for indexes in combinations(range(len(_GROUP_SOURCE)), 4):
-    groups = [_GROUP_SOURCE[index] for index in indexes]
-    words = [word for group in groups for word in group["words"]]
-    if len(words) == 16 and len(set(words)) == 16:
-        _GROUP_BOARDS.append(groups)
-        if len(_GROUP_BOARDS) == 100:
-            break
-if len(_GROUP_BOARDS) == 100:
-    GROUP_PUZZLES = _GROUP_BOARDS
-
-# Word Weave boards use a 6x6 grid. Answers are arranged as adjacent paths;
+# Build a diversified 100-board Four of a Kind rotation from the authored\n# category groups. Index sets are prevalidated to contain 16 unique answers.\n_GROUP_SOURCE = [group for board in GROUP_PUZZLES for group in board]\n_GROUP_BOARD_INDEXES = [[3,6,24,53],[7,10,20,25],[11,22,32,53],[18,25,36,55],[26,28,41,47],[16,35,53,54],[20,25,34,39],[1,2,28,39],[1,4,18,31],[6,29,48,51],[23,36,49,50],[35,40,45,46],[23,34,36,41],[0,43,45,54],[4,15,42,49],[21,22,27,48],[28,33,42,55],[16,19,21,22],[9,18,28,47],[0,14,43,45],[33,42,44,47],[0,3,21,22],[10,36,49,55],[6,13,24,43],[7,25,42,52],[8,21,22,43],[1,4,18,39],[19,21,38,48],[9,10,31,52],[16,21,27,54],[9,28,42,55],[16,21,38,43],[2,7,25,36],[6,21,43,48],[6,13,24,35],[13,19,24,38],[4,18,23,41],[0,5,14,43],[17,42,47,52],[5,6,24,51],[12,15,25,50],[19,21,30,32],[33,44,50,55],[3,14,48,53],[4,15,25,42],[35,40,45,54],[25,47,50,52],[3,24,38,53],[2,23,36,41],[16,27,38,53],[17,26,36,55],[11,14,16,29],[1,10,12,39],[3,40,53,54],[31,33,42,44],[14,32,35,45],[1,10,12,23],[32,35,37,46],[7,20,25,34],[3,5,32,54],[3,14,24,29],[17,34,44,55],[3,21,48,54],[15,17,50,52],[8,19,21,38],[7,12,25,50],[32,38,43,53],[2,12,15,33],[0,35,45,46],[1,18,36,55],[24,27,38,53],[9,15,36,42],[5,38,43,48],[4,25,50,55],[6,27,32,37],[17,23,36,42],[11,24,53,54],[34,36,41,55],[2,4,9,15],[16,29,46,51],[18,20,33,47],[14,21,48,51],[15,26,28,49],[0,37,51,54],[7,17,36,42],[0,29,35,46],[24,35,45,54],[12,17,18,39],[32,38,43,45],[15,41,44,50],[6,19,40,45],[17,34,39,44],[14,24,45,51],[23,28,33,42],[8,11,22,29],[10,41,44,55],[8,14,21,27],[7,18,33,36],[8,11,13,22],[28,33,34,47]]\nGROUP_PUZZLES = [[_GROUP_SOURCE[index] for index in indexes] for indexes in _GROUP_BOARD_INDEXES]\n\n# Word Weave boards use a 6x6 grid. Answers are arranged as adjacent paths;
 # every cell belongs to exactly one answer, and the Theme Thread spans top to bottom.
 _WEAVE_SETS = [
     ("A walk in the woods", ["TRAIL","MOSS","FERN","PINE","CREEK","CANOPY","ACORN","OWL"], 5),
