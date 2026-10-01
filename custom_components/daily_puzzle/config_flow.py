@@ -42,18 +42,68 @@ class DailyPuzzleConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
 class DailyPuzzleOptionsFlow(config_entries.OptionsFlowWithReload):
     async def async_step_init(self, user_input=None):
+        if user_input is None:
+            return self.async_show_menu(
+                step_id="init",
+                menu_options={
+                    "settings": "Puzzle settings",
+                    "reset_today": "Reset today's puzzle",
+                    "reset_all": "Reset all stats",
+                },
+            )
+        return self.async_show_menu(
+            step_id="init",
+            menu_options={
+                "settings": "Puzzle settings",
+                "reset_today": "Reset today's puzzle",
+                "reset_all": "Reset all stats",
+            },
+        )
+
+    async def async_step_settings(self, user_input=None):
         if user_input is not None:
             enabled = list(user_input.get(CONF_ENABLED_GAMES) or [])
             if not enabled:
                 return self.async_show_form(
-                    step_id="init",
+                    step_id="settings",
                     data_schema=self._schema(),
                     errors={CONF_ENABLED_GAMES: "at_least_one_game"},
                 )
             user_input[CONF_GROUP_MISTAKES] = int(user_input[CONF_GROUP_MISTAKES])
             user_input[CONF_WORD_LENGTH] = int(user_input[CONF_WORD_LENGTH])
             return self.async_create_entry(title="", data=user_input)
-        return self.async_show_form(step_id="init", data_schema=self._schema())
+        return self.async_show_form(step_id="settings", data_schema=self._schema())
+
+    async def async_step_reset_today(self, user_input=None):
+        if user_input is not None:
+            manager = self.hass.data.get(DOMAIN, {}).get(self.config_entry.entry_id)
+            if manager:
+                await manager.async_reset_today()
+            return self.async_create_entry(title="", data=dict(self.config_entry.options))
+        return self.async_show_form(
+            step_id="reset_today",
+            data_schema=vol.Schema({vol.Required("confirm", default=False): bool}),
+            description_placeholders={"warning": "This clears today's board and reverses today's credited solve, if one was recorded."},
+        )
+
+    async def async_step_reset_all(self, user_input=None):
+        if user_input is not None:
+            if not user_input.get("confirm"):
+                return self.async_show_form(
+                    step_id="reset_all",
+                    data_schema=vol.Schema({vol.Required("confirm", default=False): bool}),
+                    errors={"confirm": "confirmation_required"},
+                    description_placeholders={"warning": "This permanently clears all Daily Puzzle stats and today's board."},
+                )
+            manager = self.hass.data.get(DOMAIN, {}).get(self.config_entry.entry_id)
+            if manager:
+                await manager.async_reset_all()
+            return self.async_create_entry(title="", data=dict(self.config_entry.options))
+        return self.async_show_form(
+            step_id="reset_all",
+            data_schema=vol.Schema({vol.Required("confirm", default=False): bool}),
+            description_placeholders={"warning": "This permanently clears all Daily Puzzle stats and today's board."},
+        )
 
     def _schema(self):
         current = self.config_entry.options
