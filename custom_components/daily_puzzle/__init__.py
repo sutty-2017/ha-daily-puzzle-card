@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from datetime import date, timedelta
 
+from homeassistant.components.http import StaticPathConfig
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, ServiceCall, callback
 from homeassistant.helpers.storage import Store
-from homeassistant.components.http import StaticPathConfig
 from homeassistant.util import dt as dt_util
 
 from .const import DOMAIN, PLATFORMS, STORAGE_KEY, STORAGE_VERSION
@@ -35,13 +35,17 @@ class DailyPuzzleManager:
         await self.async_rollover()
 
     async def async_rollover(self) -> None:
-        today = dt_util.now().date().isoformat()
+        today_date = dt_util.now().date()
+        today = today_date.isoformat()
         if self.state.get("date") == today:
             return
+        last_raw = self.state.get("last_solved_date")
+        if last_raw and date.fromisoformat(last_raw) < today_date - timedelta(days=1):
+            self.state["streak"] = 0
         self.state.update({
             "date": today,
             "status": "not_started",
-            "game": "four_of_a_kind" if dt_util.now().date().toordinal() % 2 else "word_grid",
+            "game": "four_of_a_kind" if today_date.toordinal() % 2 else "word_grid",
             "game_state": {},
             "completed_at": None,
         })
@@ -75,15 +79,27 @@ class DailyPuzzleManager:
         await self.async_save()
 
 
+async def async_setup(hass: HomeAssistant, config: dict) -> bool:
+    await hass.http.async_register_static_paths([
+        StaticPathConfig(
+            "/daily_puzzle/daily-puzzle-card.js",
+            hass.config.path("custom_components/daily_puzzle/www/daily-puzzle-card.js"),
+            False,
+        )
+    ])
+    return True
+
+
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     manager = DailyPuzzleManager(hass)
     await manager.async_load()
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = manager
     hass.data[DATA_KEY] = manager
 
-
     async def handle_update(call: ServiceCall) -> None:
-        await manager.async_update_game(call.data["game"], call.data.get("game_state", {}), call.data["status"])
+        await manager.async_update_game(
+            call.data["game"], call.data.get("game_state", {}), call.data["status"]
+        )
 
     hass.services.async_register(DOMAIN, "update_game", handle_update)
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
