@@ -37,74 +37,34 @@ GROUP_PUZZLES = [
     ],
 ]
 
-# Word Weave boards are authored as paths on a 6x6 grid. Every cell belongs
-# to exactly one themed answer. The Theme Thread touches opposite grid edges.
-WEAVE_PUZZLES = [
-    {
-        "clue": "A walk in the woods",
-        "rows": 6, "cols": 6,
-        "words": [
-            {"word": "TRAIL", "path": [0, 1, 2, 3, 4]},
-            {"word": "MOSS", "path": [5, 11, 10, 9]},
-            {"word": "FERN", "path": [8, 7, 6, 12]},
-            {"word": "PINE", "path": [13, 14, 15, 16]},
-            {"word": "CREEK", "path": [17, 23, 22, 21, 20]},
-            {"word": "CANOPY", "path": [19, 18, 24, 25, 26, 27], "thread": True},
-            {"word": "ACORN", "path": [28, 29, 35, 34, 33]},
-            {"word": "OWL", "path": [32, 31, 30]},
-        ],
-    },
-    {
-        "clue": "At the seaside",
-        "rows": 6, "cols": 6,
-        "words": [
-            {"word": "SHELL", "path": [0, 1, 2, 3, 4]},
-            {"word": "DUNE", "path": [5, 11, 10, 9]},
-            {"word": "TIDE", "path": [8, 7, 6, 12]},
-            {"word": "WAVE", "path": [13, 14, 15, 16]},
-            {"word": "CORAL", "path": [17, 23, 22, 21, 20]},
-            {"word": "COASTS", "path": [19, 18, 24, 25, 26, 27], "thread": True},
-            {"word": "SANDY", "path": [28, 29, 35, 34, 33]},
-            {"word": "GUL", "path": [32, 31, 30]},
-        ],
-    },
-    {
-        "clue": "Cozy kitchen",
-        "rows": 6, "cols": 6,
-        "words": [
-            {"word": "BREAD", "path": [0, 1, 2, 3, 4]},
-            {"word": "OVEN", "path": [5, 11, 10, 9]},
-            {"word": "SOUP", "path": [8, 7, 6, 12]},
-            {"word": "HERB", "path": [13, 14, 15, 16]},
-            {"word": "SPICE", "path": [17, 23, 22, 21, 20]},
-            {"word": "DINNER", "path": [19, 18, 24, 25, 26, 27], "thread": True},
-            {"word": "APPLE", "path": [28, 29, 35, 34, 33]},
-            {"word": "TEA", "path": [32, 31, 30]},
-        ],
-    },
-    {
-        "clue": "Looking up",
-        "rows": 6, "cols": 6,
-        "words": [
-            {"word": "CLOUD", "path": [0, 1, 2, 3, 4]},
-            {"word": "MOON", "path": [5, 11, 10, 9]},
-            {"word": "STAR", "path": [8, 7, 6, 12]},
-            {"word": "BLUE", "path": [13, 14, 15, 16]},
-            {"word": "COMET", "path": [17, 23, 22, 21, 20]},
-            {"word": "SKYWAY", "path": [19, 18, 24, 25, 26, 27], "thread": True},
-            {"word": "NIGHT", "path": [28, 29, 35, 34, 33]},
-            {"word": "SUN", "path": [32, 31, 30]},
-        ],
-    },
+# Word Weave boards use a 6x6 grid. Answers are arranged as adjacent paths;
+# every cell belongs to exactly one answer, and the Theme Thread spans top to bottom.
+_WEAVE_SETS = [
+    ("A walk in the woods", ["TRAIL", "MOSS", "FERN", "PINE", "CREEK", "CANOPY", "ACORN", "OWL"], 5),
+    ("At the seaside", ["SHELL", "DUNE", "TIDE", "WAVE", "CORAL", "COASTS", "SANDY", "GUL"], 5),
+    ("Cozy kitchen", ["BREAD", "OVEN", "SOUP", "HERB", "SPICE", "DINNER", "APPLE", "TEA"], 5),
+    ("Looking up", ["CLOUD", "MOON", "STAR", "BLUE", "COMET", "SKYWAY", "NIGHT", "SUN"], 5),
+]
+_WEAVE_PATHS = [
+    [0, 1, 7, 6, 12],
+    [2, 3, 4, 5],
+    [11, 10, 9, 8],
+    [13, 14, 15, 21],
+    [20, 19, 18, 24, 25],
+    [17, 16, 22, 23, 29, 35],
+    [26, 27, 28, 34, 33],
+    [32, 31, 30],
 ]
 
 def weave_for_date(day):
-    puzzle = WEAVE_PUZZLES[day.toordinal() % len(WEAVE_PUZZLES)]
-    letters = [""] * (puzzle["rows"] * puzzle["cols"])
-    for item in puzzle["words"]:
-        for index, char in zip(item["path"], item["word"]):
-            letters[index] = char
-    return {**puzzle, "letters": letters}
+    clue, words, thread_index = _WEAVE_SETS[day.toordinal() % len(_WEAVE_SETS)]
+    letters = [""] * 36
+    answers = []
+    for index, (word, path) in enumerate(zip(words, _WEAVE_PATHS)):
+        for cell, char in zip(path, word):
+            letters[cell] = char
+        answers.append({"word": word, "path": path, "thread": index == thread_index})
+    return {"clue": clue, "rows": 6, "cols": 6, "letters": letters, "words": answers}
 
 def game_for_date(day, enabled_games=None):
     games = [game for game in (enabled_games or DEFAULT_ENABLED_GAMES) if game in DEFAULT_ENABLED_GAMES]
