@@ -97,6 +97,25 @@ GROUP_PUZZLES = [
     ],
 ]
 
+
+# Build a 100-board Four of a Kind rotation from the authored category groups.
+# Each board contains four categories and is rejected if any answer appears twice.
+_GROUP_SOURCE = [group for board in GROUP_PUZZLES for group in board]
+_GROUP_BOARDS = []
+_seen_group_boards = set()
+_seed = 0
+while len(_GROUP_BOARDS) < 100 and _seed < 10000:
+    picks = [(_seed * 7 + step * 13 + step * step * 3) % len(_GROUP_SOURCE) for step in range(4)]
+    groups = [_GROUP_SOURCE[index] for index in picks]
+    words = [word for group in groups for word in group["words"]]
+    signature = tuple(sorted(group["label"] + ":" + ",".join(group["words"]) for group in groups))
+    if len(set(picks)) == 4 and len(words) == 16 and len(set(words)) == 16 and signature not in _seen_group_boards:
+        _seen_group_boards.add(signature)
+        _GROUP_BOARDS.append(groups)
+    _seed += 1
+if len(_GROUP_BOARDS) >= 100:
+    GROUP_PUZZLES = _GROUP_BOARDS[:100]
+
 # Word Weave boards use a 6x6 grid. Answers are arranged as adjacent paths;
 # every cell belongs to exactly one answer, and the Theme Thread spans top to bottom.
 _WEAVE_SETS = [
@@ -133,13 +152,37 @@ _WEAVE_PATHS = [
     [33,32,31],
 ]
 
+def _weave_transform(path, variant):
+    def xy(cell):
+        return cell % 6, cell // 6
+    def cell(x, y):
+        return y * 6 + x
+    out = []
+    for value in path:
+        x, y = xy(value)
+        if variant == 1:
+            x = 5 - x
+        elif variant == 2:
+            y = 5 - y
+        elif variant == 3:
+            x, y = 5 - x, 5 - y
+        elif variant == 4:
+            x, y = y, x
+        out.append(cell(x, y))
+    return out
+
 def weave_for_date(day):
-    clue, words, thread_index = _WEAVE_SETS[day.toordinal() % len(_WEAVE_SETS)]
+    # 100 deterministic daily boards: authored themed answer sets are paired
+    # with multiple valid grid orientations so the board itself also varies.
+    board_index = day.toordinal() % 100
+    clue, words, thread_index = _WEAVE_SETS[board_index % len(_WEAVE_SETS)]
+    variant = (board_index // len(_WEAVE_SETS)) % 5
+    paths = [_weave_transform(path, variant) for path in _WEAVE_PATHS]
     letters = [""] * 36
     answers = []
-    for index, (word, path) in enumerate(zip(words, _WEAVE_PATHS)):
-        for cell, char in zip(path, word):
-            letters[cell] = char
+    for index, (word, path) in enumerate(zip(words, paths)):
+        for cell_index, char in zip(path, word):
+            letters[cell_index] = char
         answers.append({"word": word, "path": path, "thread": index == thread_index})
     return {"clue": clue, "rows": 6, "cols": 6, "letters": letters, "words": answers}
 
