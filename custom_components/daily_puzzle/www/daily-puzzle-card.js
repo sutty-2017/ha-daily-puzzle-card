@@ -31,10 +31,10 @@ class DailyPuzzleCard extends HTMLElement{
   this._portal.addEventListener("touchmove",e=>e.stopPropagation(),{passive:true});
   this.play();
  }
- close(){this._open=false;this._draft="";if(this._wordKey&&document.onkeydown===this._wordKey)document.onkeydown=null;this._wordKey=null;if(this._portal){this._portal.remove();this._portal=null}}
+ close(){this._open=false;this._draft="";if(this._wordKey)document.removeEventListener("keydown",this._wordKey);this._wordKey=null;if(this._portal){this._portal.remove();this._portal=null}}
  async call(s,d){await this.h.callService("daily_puzzle",s,d||{})}
  play(){let b=this._portal?.querySelector("#body"),a=this.st()?.attributes||{},g=a.game_state||{};if(!b)return;
-  if(this._wordKey&&document.onkeydown===this._wordKey){document.onkeydown=null;this._wordKey=null}
+  if(this._wordKey){document.removeEventListener("keydown",this._wordKey);this._wordKey=null}
   let gameName=a.game==="four_of_a_kind"?"Four of a Kind":"Word Grid";
   let intro=a.game==="four_of_a_kind"?"Find four groups of four related words.":"Find the five-letter word in six guesses.";
   let shell='<div class="game-title"><h2>'+gameName+'</h2><p>'+intro+'</p></div>'+(a.test_mode?'<div class="test">ADMIN · TEST GAME — stats are not affected</div>':'');
@@ -63,7 +63,7 @@ if(a.completed&&!a.replay_mode&&!a.test_mode&&this.st().state==="solved"){b.inne
     if(/^[A-Z]$/.test(key)&&draft.length<5){draft+=key;this._draft=draft;render()}
   };
   this._wordKey=e=>{if(!this._open)return;let k=e.key.toUpperCase();if(k==="BACKSPACE"){e.preventDefault();press("BACK")}else if(k==="ENTER"){e.preventDefault();press("ENTER")}else if(/^[A-Z]$/.test(k)){e.preventDefault();press(k)}};
-  document.onkeydown=this._wordKey; render();
+  document.addEventListener("keydown",this._wordKey); render();
  }
  sg(root,groups){root.className="gb";root.innerHTML=(groups||[]).map((g,i)=>'<div class="solved" style="background:'+this.c['group_'+Math.min(i+1,4)+'_color']+'"><b>'+g.label+'</b>'+g.words.join(" · ")+'</div>').join("")}
  groups(g){let p=this._portal?.querySelector("#game"),sol=g.solved_groups||[],used=new Set(sol.flatMap(x=>x.words)),seed=Number((this.st()?.attributes?.date||"").replaceAll("-",""))||1,words=sh((g.words||[]).filter(x=>!used.has(x)),seed),sel=new Set;p.innerHTML='<div class="word-hint">Select four words that share something in common.</div><div id="gb"></div><div class="msg">'+(g.last_result==="incorrect"?"Not a group — try again.":sol.length+" of 4 groups found")+'</div><div class="actions"><button class="btn" id="submit">Submit 4</button></div>';let grid=p.querySelector("#gb");this.sg(grid,sol);words.forEach(w=>{let x=document.createElement("button");x.className="tile";x.textContent=w;x.onclick=()=>{sel.has(w)?sel.delete(w):sel.size<4&&sel.add(w);x.classList.toggle("sel",sel.has(w))};grid.appendChild(x)});p.querySelector("#submit").onclick=async()=>{if(sel.size!==4)return;await this.call("submit_group",{words:[...sel]})}}
