@@ -18,7 +18,7 @@ from homeassistant.helpers.storage import Store
 from homeassistant.util import dt as dt_util
 
 from .const import (CONF_ADMIN_MODE, CONF_ENABLED_GAMES, CONF_GROUP_MISTAKES, CONF_HINTS_ENABLED, CONF_WORD_LENGTH, DEFAULT_ENABLED_GAMES, DEFAULT_GROUP_MISTAKES, DEFAULT_WORD_LENGTH, DOMAIN, GAME_NAMES, PLATFORMS, STORAGE_KEY, STORAGE_VERSION)
-from .puzzles import game_for_date, groups_for_date, word_for_date
+from .puzzles import game_for_date, groups_for_date, weave_for_date, word_for_date
 
 _LOGGER = logging.getLogger(__name__)
 DATA_KEY = f"{DOMAIN}_manager"
@@ -136,6 +136,8 @@ class DailyPuzzleManager:
             return {"mistake_limit": self.group_mistakes}
         if game == "word_grid":
             return {"word_length": self.word_length}
+        if game == "word_weave":
+            return {"found_words": [], "hints_used": 0, "hint_cells": []}
         return {}
 
     async def async_rollover(self) -> None:
@@ -171,6 +173,21 @@ class DailyPuzzleManager:
             data["hint_available"] = len(data.get("hint_pairs") or []) < 2 and any(
                 index not in used_groups and len([word for word in group["words"] if word not in solved_words]) >= 2
                 for index, group in enumerate(groups)
+            )
+        elif self.state["game"] == "word_weave":
+            puzzle = weave_for_date(day)
+            data["rows"] = puzzle["rows"]
+            data["cols"] = puzzle["cols"]
+            data["letters"] = puzzle["letters"]
+            data["clue"] = puzzle["clue"]
+            data["word_count"] = len(puzzle["words"])
+            data["thread_found"] = any(
+                item["thread"] and item["word"] in set(data.get("found_words") or [])
+                for item in puzzle["words"]
+            )
+            data["hint_available"] = len(data.get("hint_cells") or []) < 2 and any(
+                item["word"] not in set(data.get("found_words") or [])
+                for item in puzzle["words"]
             )
         elif self.state["game"] == "word_grid":
             length = int(data.get("word_length") or 0)
@@ -215,6 +232,39 @@ class DailyPuzzleManager:
             self._mark_failed_attempt()
         else:
             self.state["status"] = "in_progress"
+        await self.async_save()
+
+    async def async_submit_weave(self, path: list[int]) -> None:
+        await self.async_rollover()
+        if self.state["game"] != "word_weave" or self.state["status"] == "solved":
+            return
+        try:
+            cells = [int(cell) for cell in path]
+        except (TypeError, ValueError):
+            return
+        if len(cells) < 3 or len(cells) != len(set(cells)):
+            return
+        puzzle = weave_for_date(date.fromisoformat(self.state["date"]))
+        if any(cell < 0 or cell >= puzzle["rows"] * puzzle["cols"] for cell in cells):
+            return
+        cols = puzzle["cols"]
+        if any(max(abs(a // cols - b // cols), abs(a % cols - b % cols)) != 1 for a, b in zip(cells, cells[1:])):
+            return
+        match = next((item for item in puzzle["words"] if cells == item["path"] or cells == list(reversed(item["path"]))), None)
+        if not match:
+            return
+        game_state = dict(self.state.get("game_state") or {})
+        found = list(game_state.get("found_words") or [])
+        if match["word"] in found:
+            return
+        found.append(match["word"])
+        game_state["found_words"] = found
+        game_state["last_found"] = match["word"]
+        game_state["last_found_thread"] = bool(match["thread"])
+        self.state["game_state"] = game_state
+        self.state["status"] = "solved" if len(found) == len(puzzle["words"]) else "in_progress"
+        if self.state["status"] == "solved":
+            await self._async_complete()
         await self.async_save()
 
     async def async_submit_group(self, words: list[str]) -> None:
@@ -391,7 +441,16 @@ class DailyPuzzleManager:
             return
         day = date.fromisoformat(self.state["date"])
         game_state = dict(self.state.get("game_state") or {})
-        if self.state["game"] == "word_grid":
+        if self.state["game"] == "word_weave":
+            puzzle = weave_for_date(day)
+            found = set(game_state.get("found_words") or [])
+            hinted = list(game_state.get("hint_cells") or [])
+            candidate = next((item for item in puzzle["words"] if item["word"] not in found and item["path"][0] not in hinted), None)
+            if not candidate or len(hinted) >= 2:
+                return
+            hinted.append(candidate["path"][0])
+            game_state["hint_cells"] = hinted
+        elif self.state["game"] == "word_grid":
             length = int(game_state.get("word_length") or 0)
             if length not in (3, 4, 5, 6, 7):
                 return
@@ -476,6 +535,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     async def submit_group(call: ServiceCall) -> None:
         await manager.async_submit_group(call.data["words"])
 
+    async def submit_weave(call: ServiceCall) -> None:
+        await manager.async_submit_weave(call.data["path"])
+
     async def replay(call: ServiceCall) -> None:
         await manager.async_replay()
 
@@ -493,6 +555,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     hass.services.async_register(DOMAIN, "submit_word", submit_word, schema=vol.Schema({vol.Required("guess"): cv.string}))
     hass.services.async_register(DOMAIN, "submit_group", submit_group, schema=vol.Schema({vol.Required("words"): vol.All(cv.ensure_list, [cv.string])}))
+    hass.services.async_register(DOMAIN, "submit_weave", submit_weave, schema=vol.Schema({vol.Required("path"): vol.All(cv.ensure_list, [vol.Coerce(int)])}))
     hass.services.async_register(DOMAIN, "replay", replay)
     hass.services.async_register(DOMAIN, "admin_reset", admin_reset)
     hass.services.async_register(DOMAIN, "admin_switch_game", admin_switch_game, schema=vol.Schema({vol.Required("game"): vol.In(GAME_NAMES)}))
@@ -510,7 +573,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         if manager:
             manager.stop_timers()
         hass.data.pop(DATA_KEY, None)
-        for service in ("submit_word", "submit_group", "replay", "admin_reset", "admin_switch_game", "return_to_daily", "use_hint"):
+        for service in ("submit_word", "submit_group", "submit_weave", "replay", "admin_reset", "admin_switch_game", "return_to_daily", "use_hint"):
             hass.services.async_remove(DOMAIN, service)
     return unloaded
 
