@@ -15,6 +15,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
         DailyPuzzleSensor(manager, entry, "streak", "Daily streak", "mdi:fire"),
         DailyPuzzleSensor(manager, entry, "best_streak", "Best daily streak", "mdi:trophy"),
         DailyPuzzleSensor(manager, entry, "puzzles_solved", "Puzzles solved", "mdi:check-decagram"),
+        DailyPuzzleSensor(manager, entry, "no_hint_solves", "No-hint solves", "mdi:lightbulb-off-outline"),
         DailyPuzzleSensor(manager, entry, "game", "Today's game", "mdi:gamepad-variant"),
         DailyPuzzleSensor(manager, entry, "time_remaining", "Time remaining", "mdi:timer-outline"),
     ])

@@ -2,11 +2,13 @@ from __future__ import annotations
 
 from .const import DEFAULT_ENABLED_GAMES
 
-WORD_PUZZLES = [
-    "CRANE", "PLANT", "SHORE", "MUSIC", "LIGHT", "BREAD", "CLOUD", "TRAIN",
-    "HOUSE", "SMILE", "GRAPE", "STONE", "BRICK", "FLAME", "RIVER", "CHAIR",
-    "SWEET", "MOUSE", "BEACH", "DREAM", "CLOCK", "GREEN", "WATER", "SOUND",
-]
+WORD_PUZZLES = {
+    3: ["CAT", "SUN", "MAP", "RED", "BOX", "SKY", "CUP", "FOX", "BEE", "OAK", "SEA", "KEY", "OWL", "PEN", "ICE", "BUS"],
+    4: ["FROG", "STAR", "BOOK", "RAIN", "MOON", "TREE", "FISH", "GAME", "BIRD", "WIND", "CAKE", "LAMP", "SNOW", "ROCK", "SHIP", "FIRE"],
+    5: ["CRANE", "PLANT", "SHORE", "MUSIC", "LIGHT", "BREAD", "CLOUD", "TRAIN", "HOUSE", "SMILE", "GRAPE", "STONE", "BRICK", "FLAME", "RIVER", "CHAIR", "SWEET", "MOUSE", "BEACH", "DREAM", "CLOCK", "GREEN", "WATER", "SOUND"],
+    6: ["PLANET", "GARDEN", "STREAM", "BRIGHT", "POCKET", "WINTER", "FOREST", "CASTLE", "ORANGE", "SILVER", "BRIDGE", "MARKET", "CAMERA", "ISLAND", "BREEZE", "BUTTON"],
+    7: ["JOURNEY", "CAPTAIN", "MORNING", "THUNDER", "PICTURE", "RAINBOW", "COUNTRY", "DIAMOND", "KITCHEN", "BALLOON", "LIBRARY", "HARVEST", "COMPASS", "LANTERN", "MYSTERY", "WHISPER"],
+}
 
 GROUP_PUZZLES = [
     [
@@ -36,18 +38,18 @@ GROUP_PUZZLES = [
 ]
 
 def game_for_date(day, enabled_games=None):
-    """Choose one stable daily game from the enabled pool.
-
-    The multiplicative step avoids a visibly alternating sequence while still
-    guaranteeing the same date + pool produces the same game on every device.
-    """
     games = [game for game in (enabled_games or DEFAULT_ENABLED_GAMES) if game in DEFAULT_ENABLED_GAMES]
     if not games:
         games = list(DEFAULT_ENABLED_GAMES)
     return games[(day.toordinal() * 17 + 7) % len(games)]
 
-def word_for_date(day):
-    return WORD_PUZZLES[day.toordinal() % len(WORD_PUZZLES)]
+def word_for_date(day, length=5):
+    words = WORD_PUZZLES.get(int(length), WORD_PUZZLES[5])
+    # Give every length its own stable daily answer rather than the same list offset.
+    return words[(day.toordinal() * 17 + int(length) * 31) % len(words)]
+
+def word_lengths_for_date(day):
+    return {length: word_for_date(day, length) for length in sorted(WORD_PUZZLES)}
 
 def groups_for_date(day):
     return GROUP_PUZZLES[day.toordinal() % len(GROUP_PUZZLES)]
