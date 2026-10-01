@@ -168,7 +168,7 @@ class DailyPuzzleManager:
 
     async def async_submit_group(self, words: list[str]) -> None:
         await self.async_rollover()
-        if self.state["game"] != "four_of_a_kind" or self.state["status"] == "solved":
+        if self.state["game"] != "four_of_a_kind" or self.state["status"] in ("solved", "failed"):
             return
         selected = {str(word).strip().upper() for word in words}
         if len(selected) != 4:
@@ -317,19 +317,21 @@ class DailyPuzzleManager:
             groups = groups_for_date(day)
             solved_words = {word for group in game_state.get("solved_groups", []) for word in group["words"]}
             pairs = list(game_state.get("hint_pairs") or [])
-            used = {word for pair in pairs for word in pair}
-            candidate = next(
-                (
-                    [word for word in group["words"] if word not in solved_words and word not in used][:2]
-                    for group in groups
-                    if len([word for word in group["words"] if word not in solved_words and word not in used]) >= 2
-                ),
-                None,
-            )
+            hinted_group_indexes = list(game_state.get("hint_group_indexes") or [])
+            candidate = None
+            candidate_index = None
+            for index, group in enumerate(groups):
+                available = [word for word in group["words"] if word not in solved_words]
+                if index not in hinted_group_indexes and len(available) >= 2:
+                    candidate = available[:2]
+                    candidate_index = index
+                    break
             if not candidate or len(pairs) >= 2:
                 return
             pairs.append(candidate)
+            hinted_group_indexes.append(candidate_index)
             game_state["hint_pairs"] = pairs
+            game_state["hint_group_indexes"] = hinted_group_indexes
         else:
             return
         self.state["game_state"] = game_state
