@@ -16,8 +16,10 @@ from .const import (
     CONF_ENABLED_GAMES,
     CONF_GROUP_MISTAKES,
     CONF_HINTS_ENABLED,
+    CONF_WORD_LENGTH,
     DEFAULT_ENABLED_GAMES,
     DEFAULT_GROUP_MISTAKES,
+    DEFAULT_WORD_LENGTH,
     DOMAIN,
     GAME_NAMES,
 )
@@ -49,6 +51,7 @@ class DailyPuzzleOptionsFlow(config_entries.OptionsFlowWithReload):
                     errors={CONF_ENABLED_GAMES: "at_least_one_game"},
                 )
             user_input[CONF_GROUP_MISTAKES] = int(user_input[CONF_GROUP_MISTAKES])
+            user_input[CONF_WORD_LENGTH] = int(user_input[CONF_WORD_LENGTH])
             return self.async_create_entry(title="", data=user_input)
         return self.async_show_form(step_id="init", data_schema=self._schema())
 
@@ -74,6 +77,12 @@ class DailyPuzzleOptionsFlow(config_entries.OptionsFlowWithReload):
                 default=current.get(CONF_GROUP_MISTAKES, DEFAULT_GROUP_MISTAKES),
             ): NumberSelector(
                 NumberSelectorConfig(min=1, max=20, step=1, mode=NumberSelectorMode.BOX)
+            ),
+            vol.Required(
+                CONF_WORD_LENGTH,
+                default=current.get(CONF_WORD_LENGTH, DEFAULT_WORD_LENGTH),
+            ): NumberSelector(
+                NumberSelectorConfig(min=3, max=7, step=1, mode=NumberSelectorMode.BOX)
             ),
             vol.Required(
                 CONF_ADMIN_MODE,
