@@ -3,11 +3,11 @@ from __future__ import annotations
 from .const import DEFAULT_ENABLED_GAMES
 
 WORD_PUZZLES = {
-    3: ["CAT", "SUN", "MAP", "RED", "BOX", "SKY", "CUP", "FOX", "BEE", "OAK", "SEA", "KEY", "OWL", "PEN", "ICE", "BUS"],
-    4: ["FROG", "STAR", "BOOK", "RAIN", "MOON", "TREE", "FISH", "GAME", "BIRD", "WIND", "CAKE", "LAMP", "SNOW", "ROCK", "SHIP", "FIRE"],
-    5: ["CRANE", "PLANT", "SHORE", "MUSIC", "LIGHT", "BREAD", "CLOUD", "TRAIN", "HOUSE", "SMILE", "GRAPE", "STONE", "BRICK", "FLAME", "RIVER", "CHAIR", "SWEET", "MOUSE", "BEACH", "DREAM", "CLOCK", "GREEN", "WATER", "SOUND"],
-    6: ["PLANET", "GARDEN", "STREAM", "BRIGHT", "POCKET", "WINTER", "FOREST", "CASTLE", "ORANGE", "SILVER", "BRIDGE", "MARKET", "CAMERA", "ISLAND", "BREEZE", "BUTTON"],
-    7: ["JOURNEY", "CAPTAIN", "MORNING", "THUNDER", "PICTURE", "RAINBOW", "COUNTRY", "DIAMOND", "KITCHEN", "BALLOON", "LIBRARY", "HARVEST", "COMPASS", "LANTERN", "MYSTERY", "WHISPER"],
+    3: ["CAT","SUN","MAP","RED","BOX","SKY","CUP","FOX","BEE","OAK","SEA","KEY","OWL","PEN","ICE","BUS","ANT","CAR","DOG","EGG","FAN","HAT","JAM","LOG","MUD","NET","PIG","RUN","TOP","VAN","ZIP","AIR","BAT","COW","DAY","EAR","FIG","GEM","HEN","INK","JAR","KID","LID","NUT","PIE","RUG","TOE","WEB","YAK"],
+    4: ["FROG","STAR","BOOK","RAIN","MOON","TREE","FISH","GAME","BIRD","WIND","CAKE","LAMP","SNOW","ROCK","SHIP","FIRE","BEAR","BOAT","CAMP","CARD","CLAY","COAT","CROW","DAWN","DEER","DESK","DOOR","DRUM","DUCK","FARM","FLAG","FLOW","GLOW","GOAT","GOLD","GRAY","HILL","HOME","KITE","LAKE","LEAF","LION","MILK","NEST","PARK","PEAR","POND","RING","ROAD","ROPE","ROSE","SALT","SAND","SEAT","SEED","SHOE","SING","SOUP","WAVE","WOLF"],
+    5: ["CRANE","PLANT","SHORE","MUSIC","LIGHT","BREAD","CLOUD","TRAIN","HOUSE","SMILE","GRAPE","STONE","BRICK","FLAME","RIVER","CHAIR","SWEET","MOUSE","BEACH","DREAM","CLOCK","GREEN","WATER","SOUND","APPLE","BERRY","BLEND","BLOOM","BRAVE","BRUSH","CANDY","CHARM","CHEST","COAST","CORAL","CREAM","DANCE","EARTH","FIELD","FLOUR","FROST","FRUIT","GLASS","HEART","HONEY","HORSE","JUICE","KNIFE","LEMON","MAPLE","NIGHT","OCEAN","PAINT","PEACH","PIANO","PIZZA","PLANE","RADIO","SHEEP","SHELL","SHINE","SPICE","SPOON","STORM","TABLE","TIGER","TOAST","TRAIL","WHEAT","WORLD"],
+    6: ["PLANET","GARDEN","STREAM","BRIGHT","POCKET","WINTER","FOREST","CASTLE","ORANGE","SILVER","BRIDGE","MARKET","CAMERA","ISLAND","BREEZE","BUTTON","ANIMAL","BAKERY","BANANA","BASKET","BOTTLE","BRANCH","CANDLE","CARPET","COFFEE","DINNER","FLOWER","GUITAR","HAMMER","JACKET","KITTEN","MEADOW","MONKEY","NATURE","NEEDLE","PENCIL","PEPPER","PILLOW","RABBIT","ROCKET","SCHOOL","SHADOW","SPRING","SUMMER","SUNSET","TURTLE","VALLEY","WINDOW"],
+    7: ["JOURNEY","CAPTAIN","MORNING","THUNDER","PICTURE","RAINBOW","COUNTRY","DIAMOND","KITCHEN","BALLOON","LIBRARY","HARVEST","COMPASS","LANTERN","MYSTERY","WHISPER","AIRPORT","BLANKET","CABINET","CHICKEN","CRYSTAL","DOLPHIN","EVENING","FEATHER","FLOWERS","GIRAFFE","HAMSTER","HOLIDAY","JASMINE","KINGDOM","ORCHARD","PANCAKE","PENGUIN","POPCORN","PUMPKIN","SAILING","SPARROW","SUNRISE","TEACHER","TRACTOR","VILLAGE"],
 }
 
 GROUP_PUZZLES = [
@@ -35,25 +35,102 @@ GROUP_PUZZLES = [
         {"label": "Kinds of table", "words": ["COFFEE", "POOL", "TIMES", "PERIODIC"]},
         {"label": "Can follow fire", "words": ["WORK", "PLACE", "FLY", "WOOD"]},
     ],
+    [
+        {"label": "Things with teeth", "words": ["COMB", "SAW", "GEAR", "ZIPPER"]},
+        {"label": "Can be cracked", "words": ["EGG", "JOKE", "CODE", "KNUCKLE"]},
+        {"label": "Types of wave", "words": ["RADIO", "SOUND", "HEAT", "TIDAL"]},
+        {"label": "___ light", "words": ["DAY", "FLASH", "SPOT", "MOON"]},
+    ],
+    [
+        {"label": "Can be folded", "words": ["PAPER", "MAP", "TOWEL", "HANDS"]},
+        {"label": "Types of pitch", "words": ["SALES", "PERFECT", "ROOF", "BASEBALL"]},
+        {"label": "___ room", "words": ["CLASS", "BED", "MAIL", "COURT"]},
+        {"label": "Have strings", "words": ["GUITAR", "PUPPET", "HOODIE", "RACKET"]},
+    ],
+    [
+        {"label": "Found in a wallet", "words": ["CASH", "CARD", "ID", "RECEIPT"]},
+        {"label": "Can be streamed", "words": ["MUSIC", "MOVIE", "GAME", "VIDEO"]},
+        {"label": "___ case", "words": ["BOOK", "SUIT", "STAIR", "SHOW"]},
+        {"label": "Kinds of jam", "words": ["TRAFFIC", "PAPER", "STRAWBERRY", "TOE"]},
+    ],
+    [
+        {"label": "Can be pressed", "words": ["BUTTON", "FLOWER", "SHIRT", "CHARGES"]},
+        {"label": "Things with springs", "words": ["MATTRESS", "CLOCK", "TRAMPOLINE", "PEN"]},
+        {"label": "___ board", "words": ["KEY", "SURF", "DASH", "SCORE"]},
+        {"label": "Kinds of coat", "words": ["RAIN", "LAB", "FUR", "TRENCH"]},
+    ],
+    [
+        {"label": "Can be split", "words": ["BILL", "ATOM", "HAIR", "DECISION"]},
+        {"label": "Have a handle", "words": ["DOOR", "MUG", "PAN", "SUITCASE"]},
+        {"label": "___ pad", "words": ["NOTE", "MOUSE", "LAUNCH", "KNEE"]},
+        {"label": "Can be tied", "words": ["SHOE", "GAME", "SCORE", "APRON"]},
+    ],
+    [
+        {"label": "Can be rolled", "words": ["DICE", "DOUGH", "SLEEVE", "EYES"]},
+        {"label": "Have a stem", "words": ["FLOWER", "GLASS", "WATCH", "WORD"]},
+        {"label": "___ stone", "words": ["LIME", "SAND", "KEY", "MILE"]},
+        {"label": "Kinds of ring", "words": ["WEDDING", "BOXING", "PHONE", "TREE"]},
+    ],
+    [
+        {"label": "Things with roots", "words": ["TREE", "TOOTH", "WORD", "EQUATION"]},
+        {"label": "Can be blocked", "words": ["ROAD", "CALL", "SHOT", "DRAIN"]},
+        {"label": "___ card", "words": ["POST", "CREDIT", "GIFT", "WILD"]},
+        {"label": "Kinds of coat", "words": ["LAB", "RAIN", "FUR", "TRENCH"]},
+    ],
+    [
+        {"label": "Found on a keyboard", "words": ["SPACE", "SHIFT", "ENTER", "TAB"]},
+        {"label": "Can have a tail", "words": ["COIN", "COMET", "DOG", "KITE"]},
+        {"label": "___ fire", "words": ["CAMP", "WILD", "BON", "CROSS"]},
+        {"label": "Kinds of ball", "words": ["BASE", "BASKET", "FOOT", "MEAT"]},
+    ],
+    [
+        {"label": "Can be framed", "words": ["PHOTO", "PERSON", "QUESTION", "HOUSE"]},
+        {"label": "Things with a crown", "words": ["KING", "TOOTH", "TREE", "PINEAPPLE"]},
+        {"label": "___ break", "words": ["COFFEE", "SPRING", "LUCKY", "JAIL"]},
+        {"label": "Kinds of code", "words": ["ZIP", "AREA", "DRESS", "MORSE"]},
+    ],
+    [
+        {"label": "Can be raised", "words": ["HAND", "FLAG", "CHILD", "MONEY"]},
+        {"label": "Have a horn", "words": ["CAR", "RHINO", "TRUMPET", "UNICORN"]},
+        {"label": "___ cake", "words": ["PAN", "CUP", "CHEESE", "POUND"]},
+        {"label": "Kinds of park", "words": ["THEME", "STATE", "WATER", "BALL"]},
+    ],
 ]
 
 # Word Weave boards use a 6x6 grid. Answers are arranged as adjacent paths;
 # every cell belongs to exactly one answer, and the Theme Thread spans top to bottom.
 _WEAVE_SETS = [
-    ("A walk in the woods", ["TRAIL", "MOSS", "FERN", "PINE", "CREEK", "CANOPY", "ACORN", "OWL"], 5),
-    ("At the seaside", ["SHELL", "DUNE", "TIDE", "WAVE", "CORAL", "COASTS", "SANDY", "GUL"], 5),
-    ("Cozy kitchen", ["BREAD", "OVEN", "SOUP", "HERB", "SPICE", "DINNER", "APPLE", "TEA"], 5),
-    ("Looking up", ["CLOUD", "MOON", "STAR", "BLUE", "COMET", "SKYWAY", "NIGHT", "SUN"], 5),
+    ("A walk in the woods", ["TRAIL","MOSS","FERN","PINE","CREEK","CANOPY","ACORN","OWL"], 5),
+    ("At the seaside", ["SHELL","DUNE","TIDE","WAVE","CORAL","COASTS","SANDY","SEA"], 5),
+    ("Cozy kitchen", ["BREAD","OVEN","SOUP","HERB","SPICE","DINNER","APPLE","TEA"], 5),
+    ("Looking up", ["CLOUD","MOON","STAR","BLUE","COMET","HEAVEN","NIGHT","SUN"], 5),
+    ("Breakfast table", ["TOAST","EGGS","MILK","OATS","BACON","BRUNCH","HONEY","TEA"], 5),
+    ("In the garden", ["TULIP","SOIL","SEED","HOSE","HERBS","GARDEN","BLOOM","BEE"], 5),
+    ("Camping trip", ["TENTS","FIRE","HIKE","GEAR","TRAIL","CAMPER","WOODS","MAP"], 5),
+    ("Outer space", ["EARTH","MARS","STAR","MOON","COMET","COSMOS","ORBIT","SUN"], 5),
+    ("Winter weather", ["FROST","COAT","SNOW","SLED","CHILL","WINTER","GLOVE","ICE"], 5),
+    ("Back to school", ["BOOKS","DESK","MATH","BELL","CLASS","SCHOOL","RULER","PEN"], 5),
+    ("Road trip", ["MOTEL","ROAD","EXIT","TIRE","MILES","TRAVEL","RADIO","GAS"], 5),
+    ("Coffee shop", ["LATTE","BEAN","MUGS","BREW","ROAST","COFFEE","CREAM","CUP"], 5),
+    ("Down on the farm", ["HORSE","BARN","CROP","PLOW","WHEAT","FARMER","SHEEP","HEN"], 5),
+    ("Pets at home", ["LEASH","BOWL","PAWS","BARK","KITTY","ANIMAL","TREAT","PET"], 5),
+    ("At the bakery", ["DONUT","CAKE","ROLL","TART","FLOUR","BAKERY","ICING","PIE"], 5),
+    ("Game day", ["FIELD","BALL","TEAM","GOAL","SCORE","SPORTS","COACH","WIN"], 5),
+    ("Weather report", ["CLOUD","RAIN","WIND","HAIL","STORM","BREEZE","SUNNY","FOG"], 5),
+    ("Under the ocean", ["SHARK","REEF","WAVE","TIDE","WHALE","OCEANS","CORAL","SEA"], 5),
+    ("Movie night", ["ACTOR","FILM","ROLE","TAKE","SCENE","CINEMA","DRAMA","CUT"], 5),
+    ("Around the house", ["COUCH","DOOR","ROOM","LAMP","TABLE","HOUSES","CHAIR","BED"], 5),
+    ("Signs of spring", ["BLOOM","RAIN","BIRD","WARM","GREEN","SPRING","TULIP","BEE"], 5),
 ]
 _WEAVE_PATHS = [
-    [0, 1, 7, 6, 12],
-    [2, 3, 4, 5],
-    [11, 10, 9, 8],
-    [13, 14, 15, 21],
-    [20, 19, 18, 24, 25],
-    [17, 16, 22, 23, 29, 35],
-    [26, 27, 28, 34, 33],
-    [32, 31, 30],
+    [1,2,3,4,5],
+    [11,10,9,8],
+    [7,13,14,15],
+    [16,17,23,22],
+    [21,20,19,25,26],
+    [0,6,12,18,24,30],
+    [27,28,29,35,34],
+    [33,32,31],
 ]
 
 def weave_for_date(day):
