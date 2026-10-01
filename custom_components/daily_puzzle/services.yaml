@@ -45,3 +45,7 @@ admin_switch_game:
 return_to_daily:
   name: Return to daily puzzle
   description: Leave the test session and restore today's configured daily game.
+
+use_hint:
+  name: Use hint
+  description: Reveal the next available hint for the current puzzle when hints are enabled.
