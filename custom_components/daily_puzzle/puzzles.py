@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from itertools import combinations
+
 from .const import DEFAULT_ENABLED_GAMES
 
 WORD_PUZZLES = {
@@ -97,7 +99,8 @@ GROUP_PUZZLES = [
     ],
 ]
 
-# Word Weave boards use a 6x6 grid. Answers are arranged as adjacent paths;
+
+# Build a diversified 100-board Four of a Kind rotation from the authored\n# category groups. Index sets are prevalidated to contain 16 unique answers.\n_GROUP_SOURCE = [group for board in GROUP_PUZZLES for group in board]\n_GROUP_BOARD_INDEXES = [[3,6,24,53],[7,10,20,25],[11,22,32,53],[18,25,36,55],[26,28,41,47],[16,35,53,54],[20,25,34,39],[1,2,28,39],[1,4,18,31],[6,29,48,51],[23,36,49,50],[35,40,45,46],[23,34,36,41],[0,43,45,54],[4,15,42,49],[21,22,27,48],[28,33,42,55],[16,19,21,22],[9,18,28,47],[0,14,43,45],[33,42,44,47],[0,3,21,22],[10,36,49,55],[6,13,24,43],[7,25,42,52],[8,21,22,43],[1,4,18,39],[19,21,38,48],[9,10,31,52],[16,21,27,54],[9,28,42,55],[16,21,38,43],[2,7,25,36],[6,21,43,48],[6,13,24,35],[13,19,24,38],[4,18,23,41],[0,5,14,43],[17,42,47,52],[5,6,24,51],[12,15,25,50],[19,21,30,32],[33,44,50,55],[3,14,48,53],[4,15,25,42],[35,40,45,54],[25,47,50,52],[3,24,38,53],[2,23,36,41],[16,27,38,53],[17,26,36,55],[11,14,16,29],[1,10,12,39],[3,40,53,54],[31,33,42,44],[14,32,35,45],[1,10,12,23],[32,35,37,46],[7,20,25,34],[3,5,32,54],[3,14,24,29],[17,34,44,55],[3,21,48,54],[15,17,50,52],[8,19,21,38],[7,12,25,50],[32,38,43,53],[2,12,15,33],[0,35,45,46],[1,18,36,55],[24,27,38,53],[9,15,36,42],[5,38,43,48],[4,25,50,55],[6,27,32,37],[17,23,36,42],[11,24,53,54],[34,36,41,55],[2,4,9,15],[16,29,46,51],[18,20,33,47],[14,21,48,51],[15,26,28,49],[0,37,51,54],[7,17,36,42],[0,29,35,46],[24,35,45,54],[12,17,18,39],[32,38,43,45],[15,41,44,50],[6,19,40,45],[17,34,39,44],[14,24,45,51],[23,28,33,42],[8,11,22,29],[10,41,44,55],[8,14,21,27],[7,18,33,36],[8,11,13,22],[28,33,34,47]]\nGROUP_PUZZLES = [[_GROUP_SOURCE[index] for index in indexes] for indexes in _GROUP_BOARD_INDEXES]\n\n# Word Weave boards use a 6x6 grid. Answers are arranged as adjacent paths;
 # every cell belongs to exactly one answer, and the Theme Thread spans top to bottom.
 _WEAVE_SETS = [
     ("A walk in the woods", ["TRAIL","MOSS","FERN","PINE","CREEK","CANOPY","ACORN","OWL"], 5),
@@ -133,13 +136,37 @@ _WEAVE_PATHS = [
     [33,32,31],
 ]
 
+def _weave_transform(path, variant):
+    def xy(cell):
+        return cell % 6, cell // 6
+    def cell(x, y):
+        return y * 6 + x
+    out = []
+    for value in path:
+        x, y = xy(value)
+        if variant == 1:
+            x = 5 - x
+        elif variant == 2:
+            y = 5 - y
+        elif variant == 3:
+            x, y = 5 - x, 5 - y
+        elif variant == 4:
+            x, y = y, x
+        out.append(cell(x, y))
+    return out
+
 def weave_for_date(day):
-    clue, words, thread_index = _WEAVE_SETS[day.toordinal() % len(_WEAVE_SETS)]
+    # 100 deterministic daily boards: authored themed answer sets are paired
+    # with multiple valid grid orientations so the board itself also varies.
+    board_index = day.toordinal() % 100
+    clue, words, thread_index = _WEAVE_SETS[board_index % len(_WEAVE_SETS)]
+    variant = (board_index // len(_WEAVE_SETS)) % 5
+    paths = [_weave_transform(path, variant) for path in _WEAVE_PATHS]
     letters = [""] * 36
     answers = []
-    for index, (word, path) in enumerate(zip(words, _WEAVE_PATHS)):
-        for cell, char in zip(path, word):
-            letters[cell] = char
+    for index, (word, path) in enumerate(zip(words, paths)):
+        for cell_index, char in zip(path, word):
+            letters[cell_index] = char
         answers.append({"word": word, "path": path, "thread": index == thread_index})
     return {"clue": clue, "rows": 6, "cols": 6, "letters": letters, "words": answers}
 
