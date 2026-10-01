@@ -40,18 +40,46 @@
   "options": {
     "step": {
       "init": {
-        "title": "Daily Puzzle options",
+        "title": "Daily Puzzle",
+        "menu_options": {
+          "settings": "Puzzle settings",
+          "reset_today": "Reset today's puzzle",
+          "reset_all": "Reset all stats"
+        }
+      },
+      "settings": {
+        "title": "Puzzle settings",
         "description": "Choose the daily game pool and gameplay options. Changes apply to future daily puzzles; Admin/Test Mode is for unlimited testing.",
         "data": {
           "enabled_games": "Enabled games",
           "admin_mode": "Admin/Test Mode",
           "hints_enabled": "Enable hints",
-          "group_mistakes": "Four of a Kind allowed mistakes"
+          "group_mistakes": "Four of a Kind allowed mistakes",
+          "word_length": "Word Grid letters"
+        }
+      },
+      "reset_today": {
+        "title": "Reset today's puzzle",
+        "description": "This clears today's board and reverses today's credited solve when it was recorded by this version.",
+        "data": {
+          "confirm": "I understand — reset today"
+        }
+      },
+      "reset_all": {
+        "title": "Reset all stats",
+        "description": "This permanently clears all Daily Puzzle stats and today's board.",
+        "data": {
+          "confirm": "I understand — reset everything"
         }
       }
     },
     "error": {
-      "at_least_one_game": "Enable at least one game."
+      "at_least_one_game": "Enable at least one game.",
+      "confirmation_required": "Check the confirmation box to continue."
+    },
+    "abort": {
+      "reset_today_complete": "Today's puzzle has been reset.",
+      "reset_all_complete": "All Daily Puzzle stats and today's board have been reset."
     }
   }
 }

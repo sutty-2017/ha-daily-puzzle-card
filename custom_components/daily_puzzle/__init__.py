@@ -60,6 +60,7 @@ class DailyPuzzleManager:
             "streak": 0, "best_streak": 0, "puzzles_solved": 0, "no_hint_solves": 0,
             "last_solved_date": "", "completed": False, "completed_at": None,
             "completed_board": None, "replay_mode": False, "test_mode": False,
+            "today_credit": None,
         }
         self.state.setdefault("completed", self.state.get("status") == "solved")
         self.state.setdefault("completed_board", None)
@@ -68,6 +69,7 @@ class DailyPuzzleManager:
         self.state.setdefault("daily_snapshot", None)
         self.state.setdefault("credit_lost", False)
         self.state.setdefault("no_hint_solves", 0)
+        self.state.setdefault("today_credit", None)
         # v0.2.1 Word Grid boards were always five letters. Preserve an underway
         # or completed board instead of forcing a new length choice on upgrade.
         if self.state.get("game") == "word_grid":
@@ -147,7 +149,7 @@ class DailyPuzzleManager:
         self.state.update({
             "date": today, "status": "not_started", "game": game_for_date(today_date, self.enabled_games),
             "game_state": self._new_game_state(game_for_date(today_date, self.enabled_games), today_date), "completed": False, "completed_at": None,
-            "completed_board": None, "replay_mode": False, "test_mode": False, "daily_snapshot": None, "credit_lost": False,
+            "completed_board": None, "replay_mode": False, "test_mode": False, "daily_snapshot": None, "credit_lost": False, "today_credit": None,
         })
         await self.async_save()
 
@@ -266,18 +268,58 @@ class DailyPuzzleManager:
         today = dt_util.now().date()
         last_raw = self.state.get("last_solved_date")
         last = date.fromisoformat(last_raw) if last_raw else None
-        self.state["streak"] = self.state.get("streak", 0) + 1 if last == today - timedelta(days=1) else 1
-        self.state["best_streak"] = max(self.state.get("best_streak", 0), self.state["streak"])
-        self.state["puzzles_solved"] = self.state.get("puzzles_solved", 0) + 1
+        previous = {
+            "streak": self.state.get("streak", 0),
+            "best_streak": self.state.get("best_streak", 0),
+            "puzzles_solved": self.state.get("puzzles_solved", 0),
+            "no_hint_solves": self.state.get("no_hint_solves", 0),
+            "last_solved_date": self.state.get("last_solved_date", ""),
+        }
+        self.state["streak"] = previous["streak"] + 1 if last == today - timedelta(days=1) else 1
+        self.state["best_streak"] = max(previous["best_streak"], self.state["streak"])
+        self.state["puzzles_solved"] = previous["puzzles_solved"] + 1
         if int((self.state.get("game_state") or {}).get("hints_used", 0)) == 0:
-            self.state["no_hint_solves"] = self.state.get("no_hint_solves", 0) + 1
+            self.state["no_hint_solves"] = previous["no_hint_solves"] + 1
         self.state["last_solved_date"] = today.isoformat()
+        self.state["today_credit"] = {"date": today.isoformat(), "previous": previous}
 
     def _capture_daily_snapshot(self) -> None:
         if self.state.get("test_mode") or self.state.get("daily_snapshot"):
             return
         keys = ("game", "game_state", "status", "completed", "completed_at", "completed_board", "replay_mode", "credit_lost")
         self.state["daily_snapshot"] = {key: json.loads(json.dumps(self.state.get(key))) for key in keys}
+
+    async def async_reset_today(self) -> None:
+        await self.async_rollover()
+        today = dt_util.now().date()
+        credit = self.state.get("today_credit")
+        if isinstance(credit, dict) and credit.get("date") == today.isoformat():
+            previous = credit.get("previous") or {}
+            for key in ("streak", "best_streak", "puzzles_solved", "no_hint_solves", "last_solved_date"):
+                if key in previous:
+                    self.state[key] = previous[key]
+        game = game_for_date(today, self.enabled_games)
+        self.state.update({
+            "date": today.isoformat(), "status": "not_started", "game": game,
+            "game_state": self._new_game_state(game, today), "completed": False,
+            "completed_at": None, "completed_board": None, "replay_mode": False,
+            "test_mode": False, "daily_snapshot": None, "credit_lost": False,
+            "today_credit": None,
+        })
+        await self.async_save()
+
+    async def async_reset_all(self) -> None:
+        today = dt_util.now().date()
+        game = game_for_date(today, self.enabled_games)
+        self.state.update({
+            "date": today.isoformat(), "status": "not_started", "game": game,
+            "game_state": self._new_game_state(game, today), "streak": 0,
+            "best_streak": 0, "puzzles_solved": 0, "no_hint_solves": 0,
+            "last_solved_date": "", "completed": False, "completed_at": None,
+            "completed_board": None, "replay_mode": False, "test_mode": False,
+            "daily_snapshot": None, "credit_lost": False, "today_credit": None,
+        })
+        await self.async_save()
 
     async def async_admin_reset(self) -> None:
         await self.async_rollover()
