@@ -288,7 +288,7 @@ class DailyPuzzleManager:
         if not self.admin_mode:
             return
         self._capture_daily_snapshot()
-        self.state["game_state"] = {}
+        self.state["game_state"] = self._new_game_state(self.state["game"], date.fromisoformat(self.state["date"]))
         self.state["status"] = "not_started"
         self.state["test_mode"] = True
         await self.async_save()
@@ -299,7 +299,7 @@ class DailyPuzzleManager:
             return
         self._capture_daily_snapshot()
         self.state["game"] = game
-        self.state["game_state"] = {}
+        self.state["game_state"] = self._new_game_state(game, date.fromisoformat(self.state["date"]))
         self.state["status"] = "not_started"
         self.state["test_mode"] = True
         await self.async_save()
@@ -315,7 +315,7 @@ class DailyPuzzleManager:
             today = dt_util.now().date()
             game = game_for_date(today, self.enabled_games)
             self.state["game"] = game
-            self.state["game_state"] = {}
+            self.state["game_state"] = self._new_game_state(game, today)
             self.state["status"] = "not_started"
             self.state["replay_mode"] = False
         self.state["test_mode"] = False
