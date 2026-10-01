@@ -17,4 +17,6 @@ CONF_ENABLED_GAMES = "enabled_games"
 CONF_ADMIN_MODE = "admin_mode"
 CONF_HINTS_ENABLED = "hints_enabled"
 CONF_GROUP_MISTAKES = "group_mistakes"
+CONF_WORD_LENGTH = "word_length"
 DEFAULT_GROUP_MISTAKES = 4
+DEFAULT_WORD_LENGTH = 5

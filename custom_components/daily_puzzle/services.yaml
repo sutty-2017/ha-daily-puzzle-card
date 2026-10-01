@@ -49,16 +49,3 @@ return_to_daily:
 use_hint:
   name: Use hint
   description: Reveal the next available hint for the current puzzle when hints are enabled.
-
-select_word_length:
-  name: Select Word Grid length
-  description: Select the letter count for today's Word Grid before the attempt starts.
-  fields:
-    length:
-      required: true
-      selector:
-        number:
-          min: 3
-          max: 7
-          step: 1
-          mode: slider
