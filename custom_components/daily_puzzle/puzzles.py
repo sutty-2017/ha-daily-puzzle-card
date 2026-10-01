@@ -37,6 +37,75 @@ GROUP_PUZZLES = [
     ],
 ]
 
+# Word Weave boards are authored as paths on a 6x6 grid. Every cell belongs
+# to exactly one themed answer. The Theme Thread touches opposite grid edges.
+WEAVE_PUZZLES = [
+    {
+        "clue": "A walk in the woods",
+        "rows": 6, "cols": 6,
+        "words": [
+            {"word": "TRAIL", "path": [0, 1, 2, 3, 4]},
+            {"word": "MOSS", "path": [5, 11, 10, 9]},
+            {"word": "FERN", "path": [8, 7, 6, 12]},
+            {"word": "PINE", "path": [13, 14, 15, 16]},
+            {"word": "CREEK", "path": [17, 23, 22, 21, 20]},
+            {"word": "CANOPY", "path": [19, 18, 24, 25, 26, 27], "thread": True},
+            {"word": "ACORN", "path": [28, 29, 35, 34, 33]},
+            {"word": "OWL", "path": [32, 31, 30]},
+        ],
+    },
+    {
+        "clue": "At the seaside",
+        "rows": 6, "cols": 6,
+        "words": [
+            {"word": "SHELL", "path": [0, 1, 2, 3, 4]},
+            {"word": "DUNE", "path": [5, 11, 10, 9]},
+            {"word": "TIDE", "path": [8, 7, 6, 12]},
+            {"word": "WAVE", "path": [13, 14, 15, 16]},
+            {"word": "CORAL", "path": [17, 23, 22, 21, 20]},
+            {"word": "COASTS", "path": [19, 18, 24, 25, 26, 27], "thread": True},
+            {"word": "SANDY", "path": [28, 29, 35, 34, 33]},
+            {"word": "GUL", "path": [32, 31, 30]},
+        ],
+    },
+    {
+        "clue": "Cozy kitchen",
+        "rows": 6, "cols": 6,
+        "words": [
+            {"word": "BREAD", "path": [0, 1, 2, 3, 4]},
+            {"word": "OVEN", "path": [5, 11, 10, 9]},
+            {"word": "SOUP", "path": [8, 7, 6, 12]},
+            {"word": "HERB", "path": [13, 14, 15, 16]},
+            {"word": "SPICE", "path": [17, 23, 22, 21, 20]},
+            {"word": "DINNER", "path": [19, 18, 24, 25, 26, 27], "thread": True},
+            {"word": "APPLE", "path": [28, 29, 35, 34, 33]},
+            {"word": "TEA", "path": [32, 31, 30]},
+        ],
+    },
+    {
+        "clue": "Looking up",
+        "rows": 6, "cols": 6,
+        "words": [
+            {"word": "CLOUD", "path": [0, 1, 2, 3, 4]},
+            {"word": "MOON", "path": [5, 11, 10, 9]},
+            {"word": "STAR", "path": [8, 7, 6, 12]},
+            {"word": "BLUE", "path": [13, 14, 15, 16]},
+            {"word": "COMET", "path": [17, 23, 22, 21, 20]},
+            {"word": "SKYWAY", "path": [19, 18, 24, 25, 26, 27], "thread": True},
+            {"word": "NIGHT", "path": [28, 29, 35, 34, 33]},
+            {"word": "SUN", "path": [32, 31, 30]},
+        ],
+    },
+]
+
+def weave_for_date(day):
+    puzzle = WEAVE_PUZZLES[day.toordinal() % len(WEAVE_PUZZLES)]
+    letters = [""] * (puzzle["rows"] * puzzle["cols"])
+    for item in puzzle["words"]:
+        for index, char in zip(item["path"], item["word"]):
+            letters[index] = char
+    return {**puzzle, "letters": letters}
+
 def game_for_date(day, enabled_games=None):
     games = [game for game in (enabled_games or DEFAULT_ENABLED_GAMES) if game in DEFAULT_ENABLED_GAMES]
     if not games:
