@@ -1,0 +1,24 @@
+update_game:
+  name: Update game
+  description: Store shared progress for today's Daily Puzzle.
+  fields:
+    game:
+      name: Game
+      required: true
+      selector:
+        text:
+    status:
+      name: Status
+      required: true
+      selector:
+        select:
+          options:
+            - not_started
+            - in_progress
+            - solved
+            - failed
+    game_state:
+      name: Game state
+      required: false
+      selector:
+        object:
