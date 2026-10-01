@@ -49,3 +49,12 @@ return_to_daily:
 use_hint:
   name: Use hint
   description: Reveal the next available hint for the current puzzle when hints are enabled.
+
+submit_weave:
+  name: Submit Word Weave path
+  description: Submit a connected path of grid cells for the current Word Weave puzzle.
+  fields:
+    path:
+      required: true
+      selector:
+        object:

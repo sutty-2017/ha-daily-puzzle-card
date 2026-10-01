@@ -37,6 +37,35 @@ GROUP_PUZZLES = [
     ],
 ]
 
+# Word Weave boards use a 6x6 grid. Answers are arranged as adjacent paths;
+# every cell belongs to exactly one answer, and the Theme Thread spans top to bottom.
+_WEAVE_SETS = [
+    ("A walk in the woods", ["TRAIL", "MOSS", "FERN", "PINE", "CREEK", "CANOPY", "ACORN", "OWL"], 5),
+    ("At the seaside", ["SHELL", "DUNE", "TIDE", "WAVE", "CORAL", "COASTS", "SANDY", "GUL"], 5),
+    ("Cozy kitchen", ["BREAD", "OVEN", "SOUP", "HERB", "SPICE", "DINNER", "APPLE", "TEA"], 5),
+    ("Looking up", ["CLOUD", "MOON", "STAR", "BLUE", "COMET", "SKYWAY", "NIGHT", "SUN"], 5),
+]
+_WEAVE_PATHS = [
+    [0, 1, 7, 6, 12],
+    [2, 3, 4, 5],
+    [11, 10, 9, 8],
+    [13, 14, 15, 21],
+    [20, 19, 18, 24, 25],
+    [17, 16, 22, 23, 29, 35],
+    [26, 27, 28, 34, 33],
+    [32, 31, 30],
+]
+
+def weave_for_date(day):
+    clue, words, thread_index = _WEAVE_SETS[day.toordinal() % len(_WEAVE_SETS)]
+    letters = [""] * 36
+    answers = []
+    for index, (word, path) in enumerate(zip(words, _WEAVE_PATHS)):
+        for cell, char in zip(path, word):
+            letters[cell] = char
+        answers.append({"word": word, "path": path, "thread": index == thread_index})
+    return {"clue": clue, "rows": 6, "cols": 6, "letters": letters, "words": answers}
+
 def game_for_date(day, enabled_games=None):
     games = [game for game in (enabled_games or DEFAULT_ENABLED_GAMES) if game in DEFAULT_ENABLED_GAMES]
     if not games:

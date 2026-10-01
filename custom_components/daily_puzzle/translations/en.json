@@ -49,7 +49,7 @@
       },
       "settings": {
         "title": "Puzzle settings",
-        "description": "Choose the daily game pool and gameplay options. Changes apply to future daily puzzles; Admin/Test Mode is for unlimited testing.",
+        "description": "Choose the daily game pool and gameplay options. Word Weave is included as a third game. Changes apply to future daily puzzles; Admin/Test Mode is for unlimited testing.",
         "data": {
           "enabled_games": "Enabled games",
           "admin_mode": "Admin/Test Mode",
