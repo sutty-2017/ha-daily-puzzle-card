@@ -1,0 +1,32 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Daily Puzzle",
+        "description": "Set up a shared daily puzzle for your Home Assistant household."
+      }
+    },
+    "abort": {
+      "already_configured": "Daily Puzzle is already configured."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "status": {
+        "name": "Status"
+      },
+      "streak": {
+        "name": "Daily streak"
+      },
+      "best_streak": {
+        "name": "Best daily streak"
+      },
+      "puzzles_solved": {
+        "name": "Puzzles solved"
+      },
+      "game": {
+        "name": "Today's game"
+      }
+    }
+  }
+}
