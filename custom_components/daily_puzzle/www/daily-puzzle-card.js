@@ -1,62 +1,28 @@
-const WORDS = ["CRANE","PLANT","SHORE","MUSIC","LIGHT","BREAD","CLOUD","TRAIN","HOUSE","SMILE","GRAPE","STONE"];
-const GROUPS = [
-  [
-    {label:"Things that can be sharp", words:["KNIFE","IMAGE","TURN","CHEDDAR"]},
-    {label:"Things with keys", words:["PIANO","LOCK","MAP","KEYBOARD"]},
-    {label:"___ ball", words:["BASE","CRYSTAL","CURVE","DISCO"]},
-    {label:"Kinds of jack", words:["BLACK","UNION","LUMBER","MONTEREY"]}
-  ],
-  [
-    {label:"Can be broken",words:["RECORD","PROMISE","BONE","CODE"]},
-    {label:"Found on a desk",words:["PEN","MOUSE","PAPER","STAPLER"]},
-    {label:"Types of roll",words:["DINNER","HONOR","BARREL","CINNAMON"]},
-    {label:"Go with blue",words:["BERRY","BIRD","PRINT","MOON"]}
-  ]
-];
-
-function localDateKey(){const d=new Date();return [d.getFullYear(),String(d.getMonth()+1).padStart(2,"0"),String(d.getDate()).padStart(2,"0")].join("-");}
-function dayNumber(){return Math.floor(new Date(localDateKey()+"T12:00:00").getTime()/86400000);}
-function shuffle(items, seed){const a=[...items];let x=seed||1;for(let i=a.length-1;i>0;i--){x=(x*1664525+1013904223)>>>0;const j=x%(i+1);[a[i],a[j]]=[a[j],a[i]];}return a;}
-function wordScore(answer,guess){const out=Array(5).fill("absent"), counts={};for(let i=0;i<5;i++){if(guess[i]===answer[i])out[i]="correct";else counts[answer[i]]=(counts[answer[i]]||0)+1;}for(let i=0;i<5;i++){if(out[i]==="correct")continue;if((counts[guess[i]]||0)>0){out[i]="present";counts[guess[i]]--;}}return out;}
-
-class DailyPuzzleCard extends HTMLElement {
-  setConfig(config){this.config={title:"Daily Puzzle",hide_after:600,...config};this.render();}
-  set hass(hass){this._hass=hass;this.render();}
-  getCardSize(){return 6;}
-  getGridOptions(){return {columns:6,min_columns:4,rows:"auto"};}
-  stateObj(){return this._hass?.states?.["sensor.daily_puzzle_status"] || Object.values(this._hass?.states||{}).find(s=>s.entity_id.startsWith("sensor.")&&s.attributes?.friendly_name==="Daily Puzzle Status");}
-  async save(game,state,status){if(!this._hass)return;await this._hass.callService("daily_puzzle","update_game",{game,status,game_state:state});}
-  hiddenAfterSolve(s){if(s?.state!=="solved"||!s.attributes?.completed_at)return false;return Date.now()-new Date(s.attributes.completed_at).getTime()>(this.config.hide_after*1000);}
-  render(){
-    if(!this._hass||!this.config)return;
-    const s=this.stateObj();
-    if(this.hiddenAfterSolve(s)){this.innerHTML="";this.style.display="none";return;}
-    this.style.display="";
-    const game=(s?.attributes?.date===localDateKey()?this._hass.states["sensor.daily_puzzle_game"]?.state:null)||(dayNumber()%2?"four_of_a_kind":"word_grid");
-    const state=s?.attributes?.date===localDateKey()?(s.attributes.game_state||{}):{};
-    this.innerHTML=`<ha-card><style>
-      .wrap{padding:16px}.head{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:16px}.title{font-size:20px;font-weight:600}.stats{font-size:13px;color:var(--secondary-text-color)}
-      .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.tile,.key{border:0;border-radius:10px;background:var(--secondary-background-color);color:var(--primary-text-color);font-weight:700;min-height:52px;padding:8px;cursor:pointer}.tile.sel{outline:2px solid var(--primary-color)}
-      .actions{display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap}.action{border:0;border-radius:18px;padding:9px 14px;background:var(--primary-color);color:var(--text-primary-color);cursor:pointer}
-      .row{display:flex;gap:6px;justify-content:center;margin:6px 0}.letter{width:42px;height:42px;display:grid;place-items:center;border:2px solid var(--divider-color);font-weight:800;font-size:20px}.correct{background:#538d4e;color:white;border-color:#538d4e}.present{background:#b59f3b;color:white;border-color:#b59f3b}.absent{background:#3a3a3c;color:white;border-color:#3a3a3c}
-      input{box-sizing:border-box;width:100%;font-size:18px;padding:12px;text-transform:uppercase;background:var(--card-background-color);color:var(--primary-text-color);border:1px solid var(--divider-color);border-radius:10px}.msg{text-align:center;margin:12px 0;font-weight:600}.solved{padding:18px;text-align:center;font-size:18px}
-    </style><div class="wrap"><div class="head"><div class="title">${this.config.title}</div><div class="stats">🔥 ${this._hass.states["sensor.daily_puzzle_daily_streak"]?.state??0} · 🏆 ${this._hass.states["sensor.daily_puzzle_best_daily_streak"]?.state??0}</div></div><div id="game"></div></div></ha-card>`;
-    if(s?.state==="solved"){this.querySelector("#game").innerHTML='<div class="solved">🎉 Today’s puzzle solved!<br><small>This card will disappear shortly.</small></div>';const elapsed=Date.now()-new Date(s.attributes.completed_at).getTime();const wait=Math.max(0,this.config.hide_after*1000-elapsed);clearTimeout(this._hideTimer);this._hideTimer=setTimeout(()=>this.render(),wait+50);return;}
-    game==="word_grid"?this.renderWord(state):this.renderGroups(state);
-  }
-  renderWord(state){
-    const answer=WORDS[dayNumber()%WORDS.length], guesses=state.guesses||[], root=this.querySelector("#game");
-    root.innerHTML=guesses.map(g=>`<div class="row">${g.word.split("").map((c,i)=>`<div class="letter ${g.score[i]}">${c}</div>`).join("")}</div>`).join("")+`<div class="msg">Guess the five-letter word</div><input id="guess" maxlength="5" autocomplete="off" aria-label="Five letter guess"><div class="actions"><button class="action" id="submit">Guess</button></div>`;
-    this.querySelector("#submit").addEventListener("click",async()=>{const input=this.querySelector("#guess"),g=input.value.trim().toUpperCase();if(!/^[A-Z]{5}$/.test(g)){input.setCustomValidity("Enter five letters.");input.reportValidity();return;}const score=wordScore(answer,g),next=[...guesses,{word:g,score}];await this.save("word_grid",{guesses:next},g===answer?"solved":"in_progress");});
-  }
-  renderGroups(state){
-    const puzzle=GROUPS[dayNumber()%GROUPS.length], solved=state.solved||[], selected=new Set(), remaining=puzzle.flatMap(g=>g.words).filter(w=>!solved.includes(w)), root=this.querySelector("#game");
-    root.innerHTML=solved.length?`<div class="msg">${solved.length/4} of 4 groups found</div>`:"";
-    const grid=document.createElement("div");grid.className="grid";shuffle(remaining,dayNumber()).forEach(w=>{const b=document.createElement("button");b.className="tile";b.textContent=w;b.addEventListener("click",()=>{selected.has(w)?selected.delete(w):selected.size<4&&selected.add(w);b.classList.toggle("sel",selected.has(w));});grid.appendChild(b);});root.appendChild(grid);
-    const actions=document.createElement("div");actions.className="actions";actions.innerHTML='<button class="action" id="submit-group">Submit 4</button>';root.appendChild(actions);
-    this.querySelector("#submit-group").addEventListener("click",async()=>{if(selected.size!==4)return;const pick=[...selected], match=puzzle.find(g=>g.words.every(w=>selected.has(w)));if(!match){root.insertAdjacentHTML("beforeend",'<div class="msg">Not a group — try again.</div>');return;}const next=[...solved,...pick];await this.save("four_of_a_kind",{solved:next},next.length===16?"solved":"in_progress");});
-  }
+const D={title:"Daily Puzzle",group_1_color:"#f9df6d",group_2_color:"#a0c35a",group_3_color:"#b0c4ef",group_4_color:"#ba81c5"};
+class DailyPuzzleEditor extends HTMLElement{
+ setConfig(c){this.c=Object.assign({},D,c);this.r()} set hass(h){}
+ r(){if(!this.c)return;this.innerHTML='<div style="display:grid;gap:12px"><label>Title <input id="t" value="'+this.c.title+'" style="width:100%"></label><small>Solved groups use these colors in order.</small>'+[1,2,3,4].map(i=>'<label style="display:flex;justify-content:space-between">Group '+i+' color <input type="color" data-k="group_'+i+'_color" value="'+this.c['group_'+i+'_color']+'"></label>').join("")+'</div>';this.querySelector("#t").onchange=e=>this.ch("title",e.target.value);this.querySelectorAll("[data-k]").forEach(x=>x.oninput=e=>this.ch(e.target.dataset.k,e.target.value))}
+ ch(k,v){this.c=Object.assign({},this.c,{[k]:v});this.dispatchEvent(new CustomEvent("config-changed",{detail:{config:this.c},bubbles:true,composed:true}))}
 }
-customElements.define("daily-puzzle-card",DailyPuzzleCard);
-window.customCards=window.customCards||[];
-window.customCards.push({type:"daily-puzzle-card",name:"Daily Puzzle",description:"A shared daily word puzzle for your household.",documentationURL:"https://github.com/sutty-2017/ha-daily-puzzle-card"});
+customElements.define("daily-puzzle-card-editor",DailyPuzzleEditor);
+class DailyPuzzleCard extends HTMLElement{
+ static getConfigElement(){return document.createElement("daily-puzzle-card-editor")} static getStubConfig(){return Object.assign({},D)}
+ setConfig(c){this.c=Object.assign({},D,c);this.r()} set hass(h){this.h=h;this.r()} connectedCallback(){this.tick=setInterval(()=>this.cd(),1000)} disconnectedCallback(){clearInterval(this.tick)}
+ getCardSize(){return 2} getGridOptions(){return {columns:6,min_columns:3,rows:2}}
+ e(domain,key){let x=this.h&&this.h.states[domain+".daily_puzzle_"+key];if(x)return x;let n=("daily puzzle "+key.replaceAll("_"," ")).toLowerCase();return Object.values(this.h?.states||{}).find(s=>s.entity_id.startsWith(domain+".")&&String(s.attributes?.friendly_name||"").toLowerCase()===n)}
+ s(k){return this.e("sensor",k)?.state} st(){return this.e("sensor","status")} done(){return this.e("binary_sensor","completed")?.state==="on"}
+ time(){let raw=this.e("sensor","time_remaining")?.attributes?.next_puzzle,d=raw?new Date(raw):null;if(!d||isNaN(d))return this.s("time_remaining")||"--:--:--";let t=Math.max(0,Math.floor((d-Date.now())/1000));return String(Math.floor(t/3600)).padStart(2,"0")+":"+String(Math.floor(t%3600/60)).padStart(2,"0")+":"+String(t%60).padStart(2,"0")}
+ cd(){let x=this.querySelector("[data-cd]");if(x)x.textContent=this.time()}
+ game(){return(this.s("game")||this.st()?.attributes?.game)==="four_of_a_kind"?"Four of a Kind":"Word Grid"}
+ r(){if(!this.h||!this.c)return;let a=this.st()?.attributes||{},date=a.date?new Intl.DateTimeFormat(undefined,{month:"short",day:"numeric"}).format(new Date(a.date+"T12:00:00")):"Today";this.innerHTML='<ha-card id="card"><style>'+this.css()+'</style><div class="c"><div class="top"><div><b>'+this.c.title+'</b><small>'+date+' · '+this.game()+'</small></div><ha-icon icon="'+(this.done()?"mdi:check-circle":"mdi:puzzle")+'"></ha-icon></div><div class="timer"><span>'+(this.done()?"Next puzzle":"Time left")+'</span><strong data-cd>'+this.time()+'</strong></div><div class="stats">🔥 '+(this.s("daily_streak")||0)+' streak &nbsp; ✓ '+(this.s("puzzles_solved")||0)+' solved</div></div></ha-card><div id="pop"></div>';if(this.st())this.querySelector("#card").onclick=()=>this.open()}
+ css(){return'.c{padding:16px;display:grid;gap:12px}.top{display:flex;justify-content:space-between;align-items:center}.top b{display:block;font-size:20px}.top small,.stats{color:var(--secondary-text-color)}.timer{display:flex;justify-content:space-between;padding:10px 12px;background:var(--secondary-background-color);border-radius:12px}.timer strong{font-size:20px;font-variant-numeric:tabular-nums}#card{cursor:pointer}.ov{position:fixed;inset:0;z-index:9999;background:#0009;display:grid;place-items:center;padding:12px}.modal{width:min(900px,96vw);max-height:94vh;overflow:auto;background:var(--card-background-color);border-radius:18px}.head{position:sticky;top:0;z-index:2;background:var(--card-background-color);display:flex;justify-content:space-between;align-items:center;padding:16px;border-bottom:1px solid var(--divider-color)}.body{padding:18px;display:grid;gap:14px}.x,.btn,.tile{border:0;cursor:pointer}.x{width:42px;height:42px;border-radius:50%;background:var(--secondary-background-color);color:var(--primary-text-color)}.btn{padding:10px 16px;border-radius:999px;background:var(--primary-color);color:var(--text-primary-color);font-weight:700}.badge,.msg{text-align:center}.badge{padding:8px;background:var(--secondary-background-color);border-radius:999px}.actions{display:flex;gap:10px;justify-content:center}.wb{display:grid;gap:6px;justify-content:center}.wr{display:flex;gap:6px}.l{width:48px;height:48px;display:grid;place-items:center;border:2px solid var(--divider-color);font-weight:800}.correct{background:#538d4e;color:white}.present{background:#b59f3b;color:white}.absent{background:#3a3a3c;color:white}.guess{padding:12px;font-size:18px;text-transform:uppercase}.gb{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.tile{min-height:64px;border-radius:10px;background:var(--secondary-background-color);color:var(--primary-text-color);font-weight:700}.sel{outline:3px solid var(--primary-color)}.solved{grid-column:1/-1;text-align:center;padding:12px;border-radius:10px;color:#111}.solved b{display:block}@media(max-width:600px){.tile{font-size:12px}.body{padding:12px}}'}
+ open(){let p=this.querySelector("#pop");p.innerHTML='<div class="ov"><div class="modal"><div class="head"><div><b>'+this.c.title+'</b><small style="display:block">'+this.game()+'</small></div><button class="x" id="x"><ha-icon icon="mdi:window-minimize"></ha-icon></button></div><div class="body" id="body"></div></div></div>';p.querySelector("#x").onclick=()=>p.innerHTML="";p.querySelector(".ov").onclick=e=>{if(e.target.classList.contains("ov"))p.innerHTML=""};this.play()}
+ async call(s,d){await this.h.callService("daily_puzzle",s,d||{})}
+ play(){let b=this.querySelector("#body"),a=this.st()?.attributes||{},g=a.game_state||{};if(a.completed&&!a.replay_mode&&this.st().state==="solved"){this.complete(b,a);return}b.innerHTML=(a.completed?'<div class="badge">✓ Already completed today · Replay will not affect stats</div>':'')+'<div id="game"></div>';a.game==="four_of_a_kind"?this.groups(g):this.word(g)}
+ board(root,guesses){root.className="wb";root.innerHTML=(guesses||[]).map(g=>'<div class="wr">'+g.word.split("").map((c,i)=>'<div class="l '+g.score[i]+'">'+c+'</div>').join("")+'</div>').join("")}
+ complete(b,a){b.innerHTML='<div class="msg"><h2>🎉 Puzzle complete</h2><p>Today’s original completed board is saved.</p></div><div id="saved"></div><div class="actions"><button class="btn" id="replay">↻ Replay today’s puzzle</button></div>';let root=b.querySelector("#saved"),d=a.completed_board||{};a.game==="four_of_a_kind"?this.sg(root,d.solved_groups||[]):this.board(root,d.guesses||[]);b.querySelector("#replay").onclick=async()=>{await this.call("replay");setTimeout(()=>this.play(),60)}}
+ word(g){let p=this.querySelector("#game");p.innerHTML='<div id="wb"></div><div class="msg">Guess the five-letter word</div><div class="actions"><input class="guess" id="guess" maxlength="5"><button class="btn" id="go">Guess</button></div>';this.board(p.querySelector("#wb"),g.guesses||[]);let go=async()=>{let i=p.querySelector("#guess"),v=i.value.trim().toUpperCase();if(!/^[A-Z]{5}$/.test(v))return;await this.call("submit_word",{guess:v});setTimeout(()=>this.play(),60)};p.querySelector("#go").onclick=go;p.querySelector("#guess").onkeydown=e=>{if(e.key==="Enter")go()}}
+ sg(root,groups){root.className="gb";root.innerHTML=(groups||[]).map((g,i)=>'<div class="solved" style="background:'+this.c['group_'+Math.min(i+1,4)+'_color']+'"><b>'+g.label+'</b>'+g.words.join(" · ")+'</div>').join("")}
+ groups(g){let p=this.querySelector("#game"),sol=g.solved_groups||[],used=new Set(sol.flatMap(x=>x.words)),words=(g.words||[]).filter(x=>!used.has(x)),sel=new Set;p.innerHTML='<div id="gb"></div><div class="msg">'+(g.last_result==="incorrect"?"Not a group — try again.":sol.length+" of 4 groups found")+'</div><div class="actions"><button class="btn" id="submit">Submit 4</button></div>';let grid=p.querySelector("#gb");this.sg(grid,sol);words.forEach(w=>{let x=document.createElement("button");x.className="tile";x.textContent=w;x.onclick=()=>{sel.has(w)?sel.delete(w):sel.size<4&&sel.add(w);x.classList.toggle("sel",sel.has(w))};grid.appendChild(x)});p.querySelector("#submit").onclick=async()=>{if(sel.size!==4)return;await this.call("submit_group",{words:[...sel]});setTimeout(()=>this.play(),60)}}
+}
+customElements.define("daily-puzzle-card",DailyPuzzleCard);window.customCards=window.customCards||[];window.customCards.push({type:"daily-puzzle-card",name:"Daily Puzzle",preview:true,description:"Shared daily household puzzle."});
