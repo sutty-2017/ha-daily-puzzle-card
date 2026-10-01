@@ -68,6 +68,20 @@ class DailyPuzzleManager:
         self.state.setdefault("daily_snapshot", None)
         self.state.setdefault("credit_lost", False)
         self.state.setdefault("no_hint_solves", 0)
+        # v0.2.1 Word Grid boards were always five letters. Preserve an underway
+        # or completed board instead of forcing a new length choice on upgrade.
+        if self.state.get("game") == "word_grid":
+            game_state = dict(self.state.get("game_state") or {})
+            if not game_state.get("word_length") and (
+                game_state.get("guesses") or self.state.get("status") in ("in_progress", "solved", "failed")
+            ):
+                game_state["word_length"] = 5
+                self.state["game_state"] = game_state
+            completed_board = self.state.get("completed_board")
+            if isinstance(completed_board, dict) and completed_board.get("guesses") and not completed_board.get("word_length"):
+                completed_board = dict(completed_board)
+                completed_board["word_length"] = 5
+                self.state["completed_board"] = completed_board
         if self.state.get("test_mode") and not self.admin_mode and self.state.get("daily_snapshot"):
             self.state.update(self.state["daily_snapshot"])
             self.state["test_mode"] = False
@@ -311,13 +325,23 @@ class DailyPuzzleManager:
     async def async_replay(self) -> None:
         await self.async_rollover()
         if self.state.get("test_mode"):
-            self.state["game_state"] = {}
+            old_state = dict(self.state.get("game_state") or {})
+            self.state["game_state"] = self._new_game_state(self.state["game"], date.fromisoformat(self.state["date"]))
+            if self.state["game"] == "word_grid" and old_state.get("word_length"):
+                self.state["game_state"]["word_length"] = old_state["word_length"]
             self.state["status"] = "not_started"
             await self.async_save()
             return
         if self.state.get("status") not in ("solved", "failed") and not self.state.get("completed"):
             return
-        self.state["game_state"] = {}
+        old_state = dict(self.state.get("game_state") or {})
+        self.state["game_state"] = self._new_game_state(self.state["game"], date.fromisoformat(self.state["date"]))
+        if self.state["game"] == "word_grid":
+            length = old_state.get("word_length")
+            if not length and isinstance(self.state.get("completed_board"), dict):
+                length = self.state["completed_board"].get("word_length")
+            if length:
+                self.state["game_state"]["word_length"] = length
         self.state["status"] = "not_started"
         self.state["replay_mode"] = True
         await self.async_save()
