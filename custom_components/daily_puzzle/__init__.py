@@ -81,9 +81,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = manager
     hass.data[DATA_KEY] = manager
 
-    await hass.http.async_register_static_paths([
-        StaticPathConfig("/daily_puzzle/daily-puzzle-card.js", hass.config.path("custom_components/daily_puzzle/www/daily-puzzle-card.js"), False)
-    ])
 
     async def handle_update(call: ServiceCall) -> None:
         await manager.async_update_game(call.data["game"], call.data.get("game_state", {}), call.data["status"])
