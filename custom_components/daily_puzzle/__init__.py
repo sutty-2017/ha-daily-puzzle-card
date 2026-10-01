@@ -30,7 +30,7 @@ _CARD_STATIC_URL = f"/daily_puzzle/{_CARD_FILENAME}"
 _CARD_URL = f"{_CARD_STATIC_URL}?v={_CARD_VERSION}"
 
 def _word_score(answer: str, guess: str) -> list[str]:
-    result = ["absent"] * 5
+    result = ["absent"] * len(answer)
     counts: dict[str, int] = {}
     for i, char in enumerate(guess):
         if char == answer[i]:
@@ -57,7 +57,7 @@ class DailyPuzzleManager:
     async def async_load(self) -> None:
         self.state = await self.store.async_load() or {
             "date": "", "status": "not_started", "game": "", "game_state": {},
-            "streak": 0, "best_streak": 0, "puzzles_solved": 0,
+            "streak": 0, "best_streak": 0, "puzzles_solved": 0, "no_hint_solves": 0,
             "last_solved_date": "", "completed": False, "completed_at": None,
             "completed_board": None, "replay_mode": False, "test_mode": False,
         }
@@ -67,6 +67,7 @@ class DailyPuzzleManager:
         self.state.setdefault("test_mode", False)
         self.state.setdefault("daily_snapshot", None)
         self.state.setdefault("credit_lost", False)
+        self.state.setdefault("no_hint_solves", 0)
         if self.state.get("test_mode") and not self.admin_mode and self.state.get("daily_snapshot"):
             self.state.update(self.state["daily_snapshot"])
             self.state["test_mode"] = False
@@ -109,7 +110,7 @@ class DailyPuzzleManager:
         return max(1, int(self.entry.options.get(CONF_GROUP_MISTAKES, DEFAULT_GROUP_MISTAKES)))
 
     def _new_game_state(self, game: str, day: date) -> dict:
-        return {}
+        return {"mistake_limit": self.group_mistakes} if game == "four_of_a_kind" else {}
 
     async def async_rollover(self) -> None:
         today_date = dt_util.now().date()
@@ -137,7 +138,31 @@ class DailyPuzzleManager:
         day = date.fromisoformat(self.state["date"])
         data = dict(self.state.get("game_state") or {})
         if self.state["game"] == "four_of_a_kind":
-            data["words"] = [word for group in groups_for_date(day) for word in group["words"]]
+            groups = groups_for_date(day)
+            data["words"] = [word for group in groups for word in group["words"]]
+            solved_words = {word for group in data.get("solved_groups", []) for word in group["words"]}
+            used_groups = set(data.get("hint_group_indexes") or [])
+            data["hint_available"] = len(data.get("hint_pairs") or []) < 2 and any(
+                index not in used_groups and len([word for word in group["words"] if word not in solved_words]) >= 2
+                for index, group in enumerate(groups)
+            )
+        elif self.state["game"] == "word_grid":
+            length = int(data.get("word_length") or 0)
+            data["word_lengths"] = [3, 4, 5, 6, 7]
+            if length:
+                answer = word_for_date(day, length)
+                found = {char for guess in data.get("guesses", []) for char, score in zip(guess["word"], guess["score"]) if score in ("present", "correct")}
+                found.update(data.get("hint_letters") or [])
+                used = set(data.get("hint_types") or [])
+                vowels = set("AEIOU")
+                data["hint_available_types"] = [
+                    kind for kind, letters in (
+                        ("consonant", [c for c in answer if c not in vowels and c not in found]),
+                        ("vowel", [c for c in answer if c in vowels and c not in found]),
+                    ) if kind not in used and letters
+                ]
+            else:
+                data["hint_available_types"] = []
         return data
 
     async def async_submit_word(self, guess: str) -> None:
@@ -145,11 +170,12 @@ class DailyPuzzleManager:
         if self.state["game"] != "word_grid":
             return
         guess = guess.strip().upper()
-        if len(guess) != 5 or not guess.isalpha() or self.state["status"] == "solved":
+        game_state = dict(self.state.get("game_state") or {})
+        length = int(game_state.get("word_length") or 0)
+        if length not in (3, 4, 5, 6, 7) or len(guess) != length or not guess.isalpha() or self.state["status"] == "solved":
             return
         day = date.fromisoformat(self.state["date"])
-        answer = word_for_date(day)
-        game_state = dict(self.state.get("game_state") or {})
+        answer = word_for_date(day, length)
         guesses = list(game_state.get("guesses") or [])
         if len(guesses) >= 6:
             return
@@ -164,6 +190,19 @@ class DailyPuzzleManager:
             self._mark_failed_attempt()
         else:
             self.state["status"] = "in_progress"
+        await self.async_save()
+
+    async def async_select_word_length(self, length: int) -> None:
+        await self.async_rollover()
+        if self.state["game"] != "word_grid" or self.state["status"] != "not_started":
+            return
+        length = int(length)
+        if length not in (3, 4, 5, 6, 7):
+            return
+        game_state = dict(self.state.get("game_state") or {})
+        game_state["word_length"] = length
+        game_state.setdefault("guesses", [])
+        self.state["game_state"] = game_state
         await self.async_save()
 
     async def async_submit_group(self, words: list[str]) -> None:
@@ -184,7 +223,7 @@ class DailyPuzzleManager:
             game_state["mistakes"] = mistakes
             game_state["last_result"] = "incorrect"
             self.state["game_state"] = game_state
-            if mistakes >= self.group_mistakes:
+            if mistakes >= int(game_state.get("mistake_limit", self.group_mistakes)):
                 self.state["status"] = "failed"
                 self._mark_failed_attempt()
             else:
@@ -220,6 +259,8 @@ class DailyPuzzleManager:
         self.state["streak"] = self.state.get("streak", 0) + 1 if last == today - timedelta(days=1) else 1
         self.state["best_streak"] = max(self.state.get("best_streak", 0), self.state["streak"])
         self.state["puzzles_solved"] = self.state.get("puzzles_solved", 0) + 1
+        if int((self.state.get("game_state") or {}).get("hints_used", 0)) == 0:
+            self.state["no_hint_solves"] = self.state.get("no_hint_solves", 0) + 1
         self.state["last_solved_date"] = today.isoformat()
 
     def _capture_daily_snapshot(self) -> None:
@@ -289,7 +330,10 @@ class DailyPuzzleManager:
         day = date.fromisoformat(self.state["date"])
         game_state = dict(self.state.get("game_state") or {})
         if self.state["game"] == "word_grid":
-            answer = word_for_date(day)
+            length = int(game_state.get("word_length") or 0)
+            if length not in (3, 4, 5, 6, 7):
+                return
+            answer = word_for_date(day, length)
             guesses = list(game_state.get("guesses") or [])
             found = {
                 char
@@ -334,6 +378,7 @@ class DailyPuzzleManager:
             game_state["hint_group_indexes"] = hinted_group_indexes
         else:
             return
+        game_state["hints_used"] = int(game_state.get("hints_used", 0)) + 1
         self.state["game_state"] = game_state
         if self.state["status"] == "not_started":
             self.state["status"] = "in_progress"
@@ -366,6 +411,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     async def submit_word(call: ServiceCall) -> None:
         await manager.async_submit_word(call.data["guess"])
 
+    async def select_word_length(call: ServiceCall) -> None:
+        await manager.async_select_word_length(call.data["length"])
+
     async def submit_group(call: ServiceCall) -> None:
         await manager.async_submit_group(call.data["words"])
 
@@ -385,6 +433,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         await manager.async_use_hint()
 
     hass.services.async_register(DOMAIN, "submit_word", submit_word, schema=vol.Schema({vol.Required("guess"): cv.string}))
+    hass.services.async_register(DOMAIN, "select_word_length", select_word_length, schema=vol.Schema({vol.Required("length"): vol.All(vol.Coerce(int), vol.In([3, 4, 5, 6, 7]))}))
     hass.services.async_register(DOMAIN, "submit_group", submit_group, schema=vol.Schema({vol.Required("words"): vol.All(cv.ensure_list, [cv.string])}))
     hass.services.async_register(DOMAIN, "replay", replay)
     hass.services.async_register(DOMAIN, "admin_reset", admin_reset)
@@ -403,7 +452,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         if manager:
             manager.stop_timers()
         hass.data.pop(DATA_KEY, None)
-        for service in ("submit_word", "submit_group", "replay", "admin_reset", "admin_switch_game", "return_to_daily", "use_hint"):
+        for service in ("submit_word", "select_word_length", "submit_group", "replay", "admin_reset", "admin_switch_game", "return_to_daily", "use_hint"):
             hass.services.async_remove(DOMAIN, service)
     return unloaded
 
