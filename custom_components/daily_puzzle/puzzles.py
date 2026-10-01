@@ -35,6 +35,66 @@ GROUP_PUZZLES = [
         {"label": "Kinds of table", "words": ["COFFEE", "POOL", "TIMES", "PERIODIC"]},
         {"label": "Can follow fire", "words": ["WORK", "PLACE", "FLY", "WOOD"]},
     ],
+    [
+        {"label": "Things with teeth", "words": ["COMB", "SAW", "GEAR", "ZIPPER"]},
+        {"label": "Can be cracked", "words": ["EGG", "JOKE", "CODE", "KNUCKLE"]},
+        {"label": "Types of wave", "words": ["RADIO", "SOUND", "HEAT", "TIDAL"]},
+        {"label": "___ light", "words": ["DAY", "FLASH", "SPOT", "MOON"]},
+    ],
+    [
+        {"label": "Can be folded", "words": ["PAPER", "MAP", "TOWEL", "HANDS"]},
+        {"label": "Types of pitch", "words": ["SALES", "PERFECT", "ROOF", "BASEBALL"]},
+        {"label": "___ room", "words": ["CLASS", "BED", "MAIL", "COURT"]},
+        {"label": "Have strings", "words": ["GUITAR", "PUPPET", "HOODIE", "RACKET"]},
+    ],
+    [
+        {"label": "Found in a wallet", "words": ["CASH", "CARD", "ID", "RECEIPT"]},
+        {"label": "Can be streamed", "words": ["MUSIC", "MOVIE", "GAME", "VIDEO"]},
+        {"label": "___ case", "words": ["BOOK", "SUIT", "STAIR", "SHOW"]},
+        {"label": "Kinds of jam", "words": ["TRAFFIC", "PAPER", "STRAWBERRY", "TOE"]},
+    ],
+    [
+        {"label": "Can be pressed", "words": ["BUTTON", "FLOWER", "SHIRT", "CHARGES"]},
+        {"label": "Things with springs", "words": ["MATTRESS", "CLOCK", "TRAMPOLINE", "PEN"]},
+        {"label": "___ board", "words": ["KEY", "SURF", "DASH", "SCORE"]},
+        {"label": "Kinds of coat", "words": ["RAIN", "LAB", "FUR", "TRENCH"]},
+    ],
+    [
+        {"label": "Can be split", "words": ["BILL", "ATOM", "HAIR", "DECISION"]},
+        {"label": "Have a handle", "words": ["DOOR", "MUG", "PAN", "SUITCASE"]},
+        {"label": "___ pad", "words": ["NOTE", "MOUSE", "LAUNCH", "KNEE"]},
+        {"label": "Can be tied", "words": ["SHOE", "GAME", "SCORE", "APRON"]},
+    ],
+    [
+        {"label": "Can be rolled", "words": ["DICE", "DOUGH", "SLEEVE", "EYES"]},
+        {"label": "Have a stem", "words": ["FLOWER", "GLASS", "WATCH", "WORD"]},
+        {"label": "___ stone", "words": ["LIME", "SAND", "KEY", "MILE"]},
+        {"label": "Kinds of ring", "words": ["WEDDING", "BOXING", "PHONE", "TREE"]},
+    ],
+    [
+        {"label": "Things with roots", "words": ["TREE", "TOOTH", "WORD", "EQUATION"]},
+        {"label": "Can be blocked", "words": ["ROAD", "CALL", "SHOT", "DRAIN"]},
+        {"label": "___ card", "words": ["POST", "CREDIT", "GIFT", "WILD"]},
+        {"label": "Kinds of coat", "words": ["LAB", "RAIN", "FUR", "TRENCH"]},
+    ],
+    [
+        {"label": "Found on a keyboard", "words": ["SPACE", "SHIFT", "ENTER", "TAB"]},
+        {"label": "Can have a tail", "words": ["COIN", "COMET", "DOG", "KITE"]},
+        {"label": "___ fire", "words": ["CAMP", "WILD", "BON", "CROSS"]},
+        {"label": "Kinds of ball", "words": ["BASE", "BASKET", "FOOT", "MEAT"]},
+    ],
+    [
+        {"label": "Can be framed", "words": ["PHOTO", "PERSON", "QUESTION", "HOUSE"]},
+        {"label": "Things with a crown", "words": ["KING", "TOOTH", "TREE", "PINEAPPLE"]},
+        {"label": "___ break", "words": ["COFFEE", "SPRING", "LUCKY", "JAIL"]},
+        {"label": "Kinds of code", "words": ["ZIP", "AREA", "DRESS", "MORSE"]},
+    ],
+    [
+        {"label": "Can be raised", "words": ["HAND", "FLAG", "CHILD", "MONEY"]},
+        {"label": "Have a horn", "words": ["CAR", "RHINO", "TRUMPET", "UNICORN"]},
+        {"label": "___ cake", "words": ["PAN", "CUP", "CHEESE", "POUND"]},
+        {"label": "Kinds of park", "words": ["THEME", "STATE", "WATER", "BALL"]},
+    ],
 ]
 
 # Word Weave boards use a 6x6 grid. Answers are arranged as adjacent paths;
