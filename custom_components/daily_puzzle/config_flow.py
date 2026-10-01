@@ -76,6 +76,13 @@ class DailyPuzzleOptionsFlow(config_entries.OptionsFlowWithReload):
 
     async def async_step_reset_today(self, user_input=None):
         if user_input is not None:
+            if not user_input.get("confirm"):
+                return self.async_show_form(
+                    step_id="reset_today",
+                    data_schema=vol.Schema({vol.Required("confirm", default=False): bool}),
+                    errors={"confirm": "confirmation_required"},
+                    description_placeholders={"warning": "This clears today's board and reverses today's credited solve, if one was recorded."},
+                )
             manager = self.hass.data.get(DOMAIN, {}).get(self.config_entry.entry_id)
             if manager:
                 await manager.async_reset_today()
