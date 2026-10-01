@@ -237,6 +237,11 @@ class DailyPuzzleManager:
 
     async def async_replay(self) -> None:
         await self.async_rollover()
+        if self.state.get("test_mode"):
+            self.state["game_state"] = {}
+            self.state["status"] = "not_started"
+            await self.async_save()
+            return
         if not self.state.get("completed"):
             return
         self.state["game_state"] = {}
