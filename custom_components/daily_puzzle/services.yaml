@@ -22,3 +22,26 @@ submit_group:
 replay:
   name: Replay today's puzzle
   description: Reset the playable board for today without changing completion status, streaks, or totals.
+
+admin_reset:
+  name: Reset test game
+  description: Reset the current game when Admin/Test Mode is enabled.
+
+admin_switch_game:
+  name: Switch test game
+  description: Switch to another game type for testing without affecting daily statistics.
+  fields:
+    game:
+      name: Game
+      required: true
+      selector:
+        select:
+          options:
+            - label: Word Grid
+              value: word_grid
+            - label: Four of a Kind
+              value: four_of_a_kind
+
+return_to_daily:
+  name: Return to daily puzzle
+  description: Leave the test session and restore today's configured daily game.

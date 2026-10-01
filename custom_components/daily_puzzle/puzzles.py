@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from .const import DEFAULT_ENABLED_GAMES
+
 WORD_PUZZLES = [
     "CRANE", "PLANT", "SHORE", "MUSIC", "LIGHT", "BREAD", "CLOUD", "TRAIN",
     "HOUSE", "SMILE", "GRAPE", "STONE", "BRICK", "FLAME", "RIVER", "CHAIR",
@@ -33,8 +35,16 @@ GROUP_PUZZLES = [
     ],
 ]
 
-def game_for_date(day):
-    return "four_of_a_kind" if day.toordinal() % 2 else "word_grid"
+def game_for_date(day, enabled_games=None):
+    """Choose one stable daily game from the enabled pool.
+
+    The multiplicative step avoids a visibly alternating sequence while still
+    guaranteeing the same date + pool produces the same game on every device.
+    """
+    games = [game for game in (enabled_games or DEFAULT_ENABLED_GAMES) if game in DEFAULT_ENABLED_GAMES]
+    if not games:
+        games = list(DEFAULT_ENABLED_GAMES)
+    return games[(day.toordinal() * 17 + 7) % len(games)]
 
 def word_for_date(day):
     return WORD_PUZZLES[day.toordinal() % len(WORD_PUZZLES)]

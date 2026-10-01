@@ -50,6 +50,9 @@ class DailyPuzzleSensor(SensorEntity):
                 "completed_at": self.manager.state.get("completed_at"),
                 "completed_board": self.manager.state.get("completed_board"),
                 "replay_mode": self.manager.state.get("replay_mode", False),
+                "test_mode": self.manager.state.get("test_mode", False),
+                "admin_mode": self.manager.admin_mode,
+                "enabled_games": self.manager.enabled_games,
             }
         if self.key == "time_remaining":
             return {

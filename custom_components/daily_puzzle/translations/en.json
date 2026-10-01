@@ -12,15 +12,44 @@
   },
   "entity": {
     "sensor": {
-      "status": {"name": "Status"},
-      "streak": {"name": "Daily streak"},
-      "best_streak": {"name": "Best daily streak"},
-      "puzzles_solved": {"name": "Puzzles solved"},
-      "game": {"name": "Today's game"},
-      "time_remaining": {"name": "Time remaining"}
+      "status": {
+        "name": "Status"
+      },
+      "streak": {
+        "name": "Daily streak"
+      },
+      "best_streak": {
+        "name": "Best daily streak"
+      },
+      "puzzles_solved": {
+        "name": "Puzzles solved"
+      },
+      "game": {
+        "name": "Today's game"
+      },
+      "time_remaining": {
+        "name": "Time remaining"
+      }
     },
     "binary_sensor": {
-      "completed": {"name": "Completed"}
+      "completed": {
+        "name": "Completed"
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Daily Puzzle options",
+        "description": "Choose which games can appear in the daily pool and optionally enable Admin/Test Mode.",
+        "data": {
+          "enabled_games": "Enabled games",
+          "admin_mode": "Admin/Test Mode"
+        }
+      }
+    },
+    "error": {
+      "at_least_one_game": "Enable at least one game."
     }
   }
 }
