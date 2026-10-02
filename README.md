@@ -1,27 +1,42 @@
 # Daily Puzzle for Home Assistant
 
-A shared daily puzzle integration and companion dashboard card for Home Assistant. One household puzzle is selected each day, progress is shared across dashboards, and Home Assistant entities expose completion and stats for your own automations and dashboard visibility rules.
+A shared daily puzzle integration and companion dashboard card for Home Assistant. One household puzzle is selected each day, progress is shared across dashboards, and Home Assistant entities expose completion and stats for automations and dashboard visibility rules.
 
-> **v0.1.0:** first installable community release.
+> **Current release: v0.3.3**
 
 This project is experimental, intended for personal/community use, and developed with AI assistance.
 
-## Included in v0.1.0
+## Games
 
-- **Word Grid** — a five-letter daily word puzzle
-- **Four of a Kind** — find four groups of four related words
-- Compact dashboard card that opens a large play popup
+### Word Grid
+A daily word-guessing game with configurable **3–7 letter** answers and six guesses. Optional hints can reveal letters, and the bundled library now contains hundreds of answers across the supported lengths.
+
+### Four of a Kind
+Find four groups of four related words. The game supports configurable mistake limits, two-stage hints, custom solved-group colors, and a **100-board** daily rotation.
+
+### Word Weave
+Trace themed words through neighboring letters in a 6×6 grid, including diagonal connections. Every cell belongs to an answer and each board includes a special **Theme Thread** spanning the grid. v0.3.3 includes a **100-board deterministic rotation** built from locally bundled themed puzzle sets and validated grid orientations.
+
+## Highlights
+
+- Three daily games: **Word Grid, Four of a Kind, and Word Weave**
+- Choose which games participate in the daily rotation
+- Shared, persistent household progress across Home Assistant clients
+- Compact dashboard card that fills its available card height and opens a large play popup
 - Minimize the popup and continue later
-- Shared, persistent progress across Home Assistant clients
+- Smooth local HH:MM:SS countdown without second-by-second Home Assistant state traffic
 - Completed-board view after solving
-- **Replay today's puzzle** without changing the day's completion, streak, or total
-- Clear **Already completed today** indicator during replay
-- Current streak, best streak, and lifetime puzzles solved
+- **Replay today's puzzle** without changing official completion or stats
+- Current streak, best streak, lifetime puzzles solved, and **No-Hint Solves**
+- Optional hints with game-specific behavior
+- Configurable Word Grid length and Four of a Kind mistake limit
+- **Cozy Style** plus visual card controls for background, accent, title, keyboard, tile, and solved-group colors
+- Admin/Test Mode for switching and resetting games without affecting official daily stats
+- Reset Today's Puzzle and Reset All Stats controls in integration settings
 - Completed binary sensor for dashboard visibility and automations
-- Time-remaining sensor plus a smooth HH:MM:SS countdown on the card
-- Four customizable Four of a Kind group colors in the visual card editor
 - Bundled card is automatically served and registered by the integration
-- Local puzzle selection; no puzzle API, AI service, account, or API key required
+- Local deterministic puzzle selection; no puzzle API, AI service, account, or API key required
+- Rendering is designed to preserve in-progress input and selections during unrelated Home Assistant updates
 
 ## Installation
 
@@ -40,21 +55,22 @@ The integration bundles and registers its Lovelace card automatically. A manual 
 
     type: custom:daily-puzzle-card
 
-The visual editor also lets you change the card title and the four solved-group colors.
+The visual editor exposes the card's appearance settings. Game behavior such as enabled games, Word Grid length, hints, and Four of a Kind mistake limits is configured from the integration's **Configure** screen.
 
 ## Entities
 
-Daily Puzzle creates:
+Daily Puzzle creates entities for:
 
-- **Completed** — binary sensor; ON once today's puzzle has been completed
+- **Completed** — binary sensor; ON once today's official puzzle has been completed
 - **Status** — current play state and shared board data
 - **Today's game**
-- **Time remaining** — time until the next daily puzzle; includes the exact next-puzzle timestamp
+- **Time remaining** — time until the next daily puzzle, including the exact next-puzzle timestamp
 - **Daily streak**
 - **Best daily streak**
 - **Puzzles solved**
+- **No-Hint Solves**
 
-The Completed sensor intentionally stays ON after Replay. Replay resets only the playable board; it does not erase the day's completion or award stats a second time.
+The Completed sensor intentionally stays ON during Replay. Replay resets only the active playable board; it does not erase the day's official completion or award stats a second time.
 
 ## Dashboard visibility
 
@@ -66,13 +82,15 @@ This keeps presentation policy in Home Assistant: another household may prefer t
 
 The integration chooses the game and bundled puzzle deterministically from Home Assistant's local date. The backend owns puzzle answers, validation, shared progress, daily rollover, completion, and statistics. The card is the presentation layer.
 
-The card's countdown animates once per second in the browser, while the Home Assistant time-remaining entity updates at a much lower rate. This avoids unnecessary recorder/state traffic just to animate seconds.
+All puzzle content is bundled locally. The card's countdown animates once per second in the browser while the Home Assistant time-remaining entity updates much less frequently, avoiding unnecessary recorder/state traffic just to animate seconds.
 
-## Replay behavior
+## Replay and Admin/Test Mode
 
-After the first solve, the original completed board is retained. Pressing **Replay today's puzzle** starts the same daily puzzle again and displays an **Already completed today** indicator.
+After the first official solve, the original completed board is retained. Pressing **Replay today's puzzle** starts the same daily puzzle again and displays an **Already completed today** indicator.
 
 Replay never turns the Completed sensor back off, removes the original completion, increments Puzzles solved again, or changes the day's streak credit.
+
+**Admin/Test Mode** lets you switch among Word Grid, Four of a Kind, and Word Weave and reset the test board for development or casual play. Test-mode activity does not affect the official daily completion, streak, solved totals, or no-hint totals. Returning to Today restores the real daily state.
 
 ## Privacy and network use
 
@@ -80,4 +98,4 @@ Daily Puzzle does not require an external puzzle server, account, AI API, or API
 
 ## Disclaimer
 
-This is an independent Home Assistant community project. It is not affiliated with or endorsed by The New York Times, Wordle, Connections, Home Assistant, or Nabu Casa. Game mechanics may be inspired by familiar word-puzzle formats, but puzzle content and presentation are original to this project.
+This is an independent Home Assistant community project. It is not affiliated with or endorsed by The New York Times, Wordle, Connections, Strands, Home Assistant, or Nabu Casa. Game mechanics may be inspired by familiar word-puzzle formats, but puzzle content, game names, and presentation are original to this project.
