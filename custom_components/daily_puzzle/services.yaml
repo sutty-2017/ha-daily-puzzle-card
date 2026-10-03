@@ -58,3 +58,7 @@ submit_weave:
       required: true
       selector:
         object:
+
+reveal_answer:
+  name: Reveal failed puzzle answer
+  description: Reveal the solution after a failed attempt without awarding completion or changing statistics.
