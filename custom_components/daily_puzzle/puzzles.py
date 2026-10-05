@@ -547,6 +547,35 @@ def _weave_transform(path, variant):
         out.append(cell(x, y))
     return out
 
+def _validate_content():
+    if len(_GROUP_SOURCE) != 300 or len(GROUP_PUZZLES) != 300:
+        raise RuntimeError("Four of a Kind content library must contain 300 groups and 300 boards")
+    if any(len(group["words"]) != 4 for group in _GROUP_SOURCE):
+        raise RuntimeError("Every Four of a Kind category must contain four answers")
+    if any(len({word for group in board for word in group["words"]}) != 16 for board in GROUP_PUZZLES):
+        raise RuntimeError("Four of a Kind boards must contain 16 unique answers")
+    expected_lengths = (5, 4, 4, 4, 5, 6, 5, 3)
+    if len(_WEAVE_SETS) != 300:
+        raise RuntimeError("Word Weave content library must contain 300 themes")
+    if len({clue for clue, _, _ in _WEAVE_SETS}) != 300:
+        raise RuntimeError("Word Weave theme names must be unique")
+    if len({tuple(words) for _, words, _ in _WEAVE_SETS}) != 300:
+        raise RuntimeError("Word Weave answer boards must be unique")
+    if any(tuple(map(len, words)) != expected_lengths or len(set(words)) != 8 for _, words, _ in _WEAVE_SETS):
+        raise RuntimeError("Word Weave answers must fit the 36-cell paths and be unique")
+    for holiday, (_, words, _) in _HOLIDAY_WEAVES.items():
+        if tuple(map(len, words)) != expected_lengths or len(set(words)) != 8:
+            raise RuntimeError(f"Invalid holiday Word Weave content: {holiday}")
+    for holiday, answers in _HOLIDAY_WORDS.items():
+        if any(len(answer) != length for length, answer in answers.items()):
+            raise RuntimeError(f"Invalid holiday Word Grid content: {holiday}")
+    for holiday, groups in _HOLIDAY_GROUPS.items():
+        words = [word for _, group_words in groups for word in group_words]
+        if len(groups) != 4 or any(len(group_words) != 4 for _, group_words in groups) or len(set(words)) != 16:
+            raise RuntimeError(f"Invalid holiday Four of a Kind content: {holiday}")
+
+_validate_content()
+
 def weave_for_date(day):
     from datetime import date
     holiday = holiday_for_date(day)
