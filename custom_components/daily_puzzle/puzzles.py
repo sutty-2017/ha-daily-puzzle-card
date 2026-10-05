@@ -141,6 +141,23 @@ _HOLIDAY_WORDS = {
 "veterans":"HONOR","thanksgiving":"FEAST","christmas":"HOLLY",
 "valentines":"HEART","st_patricks":"GREEN","halloween":"GHOST",
 }
+_HOLIDAY_WEAVES = {
+"new_year":("New Year's Eve",["CLOCK","YEAR","HOPE","BELL","PARTY","CHEERS","TOAST","NEW"],5),
+"mlk":("Dr. Martin Luther King Jr. Day",["DREAM","HOPE","VOTE","LEAD","PEACE","RIGHTS","UNITY","ACT"],5),
+"presidents":("Presidents Day",["WHITE","OVAL","VOTE","FLAG","CIVIC","LEADER","UNION","USA"],5),
+"memorial":("Memorial Day",["HONOR","FLAG","TAPS","NAME","BRAVE","SALUTE","STONE","USA"],5),
+"juneteenth":("Juneteenth",["UNITY","FREE","HOPE","SONG","DANCE","RIGHTS","BLACK","JOY"],5),
+"independence":("Independence Day",["STARS","FLAG","BOOM","JULY","SPARK","PARADE","EAGLE","USA"],5),
+"labor":("Labor Day",["CRAFT","WORK","TOOL","TEAM","SHIFT","WORKER","UNION","JOB"],5),
+"columbus":("Exploration Day",["OCEAN","SHIP","SAIL","MAPS","NORTH","VOYAGE","CHART","SEA"],5),
+"veterans":("Veterans Day",["HONOR","DUTY","FLAG","ARMY","BRAVE","SALUTE","MEDAL","USA"],5),
+"thanksgiving":("Thanksgiving",["FEAST","YAMS","CORN","TART","GRAVY","TURKEY","THANK","PIE"],5),
+"christmas":("Christmas",["HOLLY","GIFT","STAR","BELL","ANGEL","WREATH","SANTA","JOY"],5),
+"valentines":("Valentine's Day",["HEART","LOVE","ROSE","DATE","CANDY","KISSES","CUPID","HUG"],5),
+"st_patricks":("St. Patrick's Day",["GREEN","LUCK","HARP","IRISH","CHARM","CLOVER","LEAFY","JIG"],5),
+"halloween":("Halloween",["GHOST","MASK","DARK","BOO!","WITCH","CANDLE","TREAT","BOO"],5),
+}
+
 _HOLIDAY_GROUPS = {
 "new_year":[("At midnight",["CLOCK","COUNTDOWN","KISS","CHEERS"]),("Fresh starts",["GOAL","PLAN","RESOLVE","BEGIN"]),("Party supplies",["HAT","HORN","CONFETTI","BALLOON"]),("Calendar words",["YEAR","MONTH","WEEK","DATE"])],
 "mlk":[("Community action",["SERVE","MARCH","VOTE","LEAD"]),("Values",["JUSTICE","PEACE","EQUALITY","UNITY"]),("Public speaking",["SPEECH","PODIUM","CROWD","MIC"]),("Ways to help",["GIVE","TEACH","LISTEN","BUILD"])],
@@ -494,6 +511,17 @@ def _weave_transform(path, variant):
 
 def weave_for_date(day):
     from datetime import date
+    holiday = holiday_for_date(day)
+    if holiday in _HOLIDAY_WEAVES:
+        clue, words, thread_index = _HOLIDAY_WEAVES[holiday]
+        paths = _WEAVE_PATHS
+        letters = [""] * 36
+        answers = []
+        for index, (word, path) in enumerate(zip(words, paths)):
+            for cell_index, char in zip(path, word):
+                letters[cell_index] = char
+            answers.append({"word": word, "path": path, "thread": index == thread_index})
+        return {"clue": clue, "rows": 6, "cols": 6, "letters": letters, "words": answers}
     # Preserve the released v0.3.3 mapping for existing dates. New dates use
     # theme-first rotation so all 300 themes appear before a layout repeats.
     if day < date(2026, 10, 6):
