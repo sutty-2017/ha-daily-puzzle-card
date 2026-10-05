@@ -164,10 +164,20 @@ def holiday_for_date(day):
     return moving.get(day)
 
 _HOLIDAY_WORDS = {
-"new_year":"CLOCK","mlk":"DREAM","presidents":"CIVIC","memorial":"HONOR",
-"juneteenth":"UNITY","independence":"STARS","labor":"CRAFT","columbus":"OCEAN",
-"veterans":"HONOR","thanksgiving":"FEAST","christmas":"HOLLY",
-"valentines":"HEART","st_patricks":"GREEN","halloween":"GHOST",
+"new_year":{3:"NEW",4:"YEAR",5:"CLOCK",6:"CHEERS",7:"PARTIES"},
+"mlk":{3:"ACT",4:"HOPE",5:"DREAM",6:"RIGHTS",7:"JUSTICE"},
+"presidents":{3:"USA",4:"VOTE",5:"CIVIC",6:"LEADER",7:"CAPITOL"},
+"memorial":{3:"USA",4:"TAPS",5:"HONOR",6:"SALUTE",7:"SERVICE"},
+"juneteenth":{3:"JOY",4:"FREE",5:"UNITY",6:"RIGHTS",7:"FREEDOM"},
+"independence":{3:"USA",4:"FLAG",5:"STARS",6:"PARADE",7:"LIBERTY"},
+"labor":{3:"JOB",4:"WORK",5:"CRAFT",6:"WORKER",7:"LABORER"},
+"columbus":{3:"MAP",4:"SHIP",5:"OCEAN",6:"VOYAGE",7:"COMPASS"},
+"veterans":{3:"USA",4:"DUTY",5:"HONOR",6:"SALUTE",7:"SERVICE"},
+"thanksgiving":{3:"PIE",4:"YAMS",5:"FEAST",6:"TURKEY",7:"HARVEST"},
+"christmas":{3:"JOY",4:"GIFT",5:"HOLLY",6:"WREATH",7:"PRESENT"},
+"valentines":{3:"HUG",4:"LOVE",5:"HEART",6:"KISSES",7:"FLOWERS"},
+"st_patricks":{3:"JIG",4:"LUCK",5:"GREEN",6:"CLOVER",7:"RAINBOW"},
+"halloween":{3:"BOO",4:"MASK",5:"GHOST",6:"CANDLE",7:"PUMPKIN"},
 }
 _HOLIDAY_WEAVES = {
 "new_year":("New Year's Eve",["CLOCK","YEAR","HOPE","BELL","PARTY","CHEERS","TOAST","NEW"],5),
@@ -581,8 +591,8 @@ def game_for_date(day, enabled_games=None):
 def word_for_date(day, length=5):
     length = int(length)
     holiday = holiday_for_date(day)
-    if holiday and length == 5:
-        return _HOLIDAY_WORDS[holiday]
+    if holiday and length in _HOLIDAY_WORDS.get(holiday, {}):
+        return _HOLIDAY_WORDS[holiday][length]
     words = WORD_PUZZLES.get(length, WORD_PUZZLES[5])
     from datetime import date
     if length == 5 and day < date(2026, 10, 6):
