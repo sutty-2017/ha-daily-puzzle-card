@@ -515,7 +515,7 @@ _WEAVE_SETS = [
     ("Kangaroos", ["JUMPS","JUMP","TAIL","HOPS","GRASS","DESERT","YOUNG","ZOO"], 5),
     ("Meerkats", ["WATCH","SAND","DENS","LOOK","ALERT","DESERT","GROUP","ZOO"], 5),
     ("Otters", ["OTTER","SWIM","ROCK","PLAY","RIVER","MARINE","SHELL","SEA"], 5),
-    ("Peacocks", ["PLUME","TAIL","BLUE","SHOW","PLUME","BIRDIE","GREEN","ZOO"], 5),
+    ("Peacocks", ["PROUD","TAIL","BLUE","SHOW","PLUME","BIRDIE","GREEN","ZOO"], 5),
 ]
 _WEAVE_PATHS = [
     [1,2,3,4,5],
