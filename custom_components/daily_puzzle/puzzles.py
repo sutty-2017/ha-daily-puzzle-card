@@ -114,14 +114,14 @@ def _build_group_puzzles():
     cursor = 0
     count = len(_GROUP_SOURCE)
     while len(boards) < 300 and cursor < 100000:
-        indexes = tuple(sorted({
-            (cursor * 37 + 0) % count,
-            (cursor * 37 + 71) % count,
-            (cursor * 37 + 155) % count,
-            (cursor * 37 + 239) % count,
-        }))
+        value = cursor + 1
+        chosen = set()
+        while len(chosen) < 4:
+            value = (1664525 * value + 1013904223) & 0xFFFFFFFF
+            chosen.add(value % count)
+        indexes = tuple(sorted(chosen))
         cursor += 1
-        if len(indexes) != 4 or indexes in signatures:
+        if indexes in signatures:
             continue
         groups = [_GROUP_SOURCE[index] for index in indexes]
         words = [word for group in groups for word in group["words"]]
