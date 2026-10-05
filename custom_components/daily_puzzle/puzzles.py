@@ -151,8 +151,8 @@ _HOLIDAY_GROUPS = {
 "veterans":[("Service",["DUTY","HONOR","COURAGE","SACRIFICE"]),("Military branches",["ARMY","NAVY","MARINES","AIRFORCE"]),("Ceremony",["FLAG","SALUTE","PARADE","SPEECH"]),("Uniform items",["BOOT","CAP","BADGE","MEDAL"])],
 "thanksgiving":[("On the table",["TURKEY","GRAVY","STUFFING","CRANBERRY"]),("Desserts",["PIE","CAKE","TART","COOKIE"]),("Harvest",["CORN","GOURD","APPLE","WHEAT"]),("Gathering",["FAMILY","FRIENDS","DINNER","THANKS"])],
 "christmas":[("Tree decorations",["LIGHTS","STAR","TINSEL","ORNAMENT"]),("Santa's trip",["SLEIGH","REINDEER","CHIMNEY","NORTH"]),("Wrapped up",["GIFT","BOX","BOW","PAPER"]),("Holiday treats",["COOKIE","COCOA","CANDY","GINGER"])],
-"valentines":[("Valentine gifts",["ROSES","CANDY","CARD","FLOWERS"]),("Terms of affection",["DEAR","HONEY","SWEETIE","LOVE"]),("Heart shapes",["LOCKET","COOKIE","BALLOON","CANDY"]),("Date night",["DINNER","MOVIE","DANCE","MUSIC"])],
-"st_patricks":[("Going green",["CLOVER","EMERALD","LIME","MOSS"]),("Lucky things",["HORSESHOE","RABBIT","PENNY","CLOVER"]),("Irish symbols",["HARP","SHAMROCK","GREEN","CELTIC"]),("Parade day",["MARCH","FLOAT","MUSIC","CROWD"])],
+"valentines":[("Valentine gifts",["ROSES","CANDY","CARD","FLOWERS"]),("Terms of affection",["DEAR","HONEY","SWEETIE","LOVE"]),("Heart shapes",["LOCKET","COOKIE","BALLOON","PENDANT"]),("Date night",["DINNER","MOVIE","DANCE","MUSIC"])],
+"st_patricks":[("Going green",["CLOVER","EMERALD","LIME","MOSS"]),("Lucky things",["HORSESHOE","RABBIT","PENNY","CHARM"]),("Irish symbols",["HARP","SHAMROCK","GREEN","CELTIC"]),("Parade day",["MARCH","FLOAT","MUSIC","CROWD"])],
 "halloween":[("Costumes",["WITCH","GHOST","VAMPIRE","PIRATE"]),("Trick-or-treat",["CANDY","BAG","DOORBELL","PORCH"]),("Spooky places",["CRYPT","ATTIC","CELLAR","GRAVEYARD"]),("Pumpkin carving",["KNIFE","SEEDS","CANDLE","FACE"])],
 }
 
