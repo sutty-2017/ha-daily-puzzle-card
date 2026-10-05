@@ -130,6 +130,60 @@ _WEAVE_SETS = [
     ("Movie night", ["ACTOR","FILM","ROLE","TAKE","SCENE","CINEMA","DRAMA","CUT"], 5),
     ("Around the house", ["COUCH","DOOR","ROOM","LAMP","TABLE","HOUSES","CHAIR","BED"], 5),
     ("Signs of spring", ["BLOOM","RAIN","BIRD","WARM","GREEN","SPRING","TULIP","BEE"], 5),
+    ("Autumn days", ["MAPLE","FALL","RUST","COZY","ACORN","AUTUMN","CIDER","PIE"], 5),
+    ("Halloween night", ["GHOST","MASK","BATS","DARK","CANDY","SPOOKY","WITCH","BOO"], 5),
+    ("Thanksgiving table", ["GRAVY","YAMS","CORN","OVEN","PLATE","DINNER","FEAST","HAM"], 5),
+    ("Christmas morning", ["HOLLY","STAR","GIFT","BELL","ELVES","TINSEL","SANTA","JOY"], 5),
+    ("New Year's Eve", ["CLOCK","YEAR","BALL","KISS","PARTY","CHEERS","SPARK","EVE"], 5),
+    ("Valentine's Day", ["HEART","LOVE","ROSE","DATE","CANDY","CUPIDS","SWEET","HUG"], 5),
+    ("Easter morning", ["BUNNY","EGGS","HUNT","NEST","JELLY","SPRING","CHICK","DYE"], 5),
+    ("Summer vacation", ["BEACH","HEAT","SWIM","SAND","SUNNY","SUMMER","WAVES","SUN"], 5),
+    ("Rainy day", ["CLOUD","RAIN","BOOT","DROP","STORM","SHOWER","MISTY","WET"], 5),
+    ("Thunderstorm", ["LIGHT","RAIN","WIND","DARK","CLOUD","STORMS","FLASH","SKY"], 5),
+    ("Rainbow colors", ["COLOR","ARCH","RAIN","GLOW","PRISM","BRIGHT","CLOUD","SKY"], 5),
+    ("Mountain hike", ["PEAKS","ROCK","HIKE","COLD","TRAIL","SUMMIT","CLIFF","MAP"], 5),
+    ("Desert trip", ["CACTI","SAND","HEAT","DUNE","OASIS","DESERT","CAMEL","SUN"], 5),
+    ("Along the river", ["WATER","FLOW","BANK","RAFT","CREEK","STREAM","REEDS","DAM"], 5),
+    ("At the lake", ["DOCKS","BOAT","FISH","SWIM","WATER","ISLAND","CABIN","OAR"], 5),
+    ("City streets", ["BLOCK","TAXI","ROAD","SIGN","LIGHT","STREET","PLAZA","BUS"], 5),
+    ("At the airport", ["PLANE","GATE","BAGS","TAXI","PILOT","FLIGHT","TOWER","JET"], 5),
+    ("At the beach", ["SHELL","SAND","WAVE","TIDE","OCEAN","COASTS","BOARD","SEA"], 5),
+    ("Fishing trip", ["HOOKS","BAIT","BOAT","LINE","TROUT","ANGLER","REELS","ROD"], 5),
+    ("Picnic time", ["GRAPE","PARK","FOOD","BOWL","BREAD","PICNIC","APPLE","ANT"], 5),
+    ("Birthday party", ["CAKES","GIFT","CARD","WISH","CANDY","CANDLE","PARTY","HAT"], 5),
+    ("Wedding day", ["BRIDE","RING","VOWS","CAKE","DANCE","GROOMS","WHITE","JOY"], 5),
+    ("At the circus", ["CLOWN","RING","TENT","SHOW","TRICK","CIRCUS","HORSE","FUN"], 5),
+    ("At the zoo", ["TIGER","BEAR","LION","CAGE","ZEBRA","MONKEY","OTTER","APE"], 5),
+    ("Safari", ["ZEBRA","LION","JEEP","WILD","RHINO","SAFARI","HYENA","MAP"], 5),
+    ("Bird watching", ["ROBIN","WING","NEST","SONG","EAGLE","BIRDIE","HERON","OWL"], 5),
+    ("Butterfly garden", ["WINGS","PINK","BLUE","REST","BLOOM","GARDEN","PETAL","BUG"], 5),
+    ("Dog park", ["LEASH","BARK","BALL","WALK","TREAT","CANINE","FETCH","DOG"], 5),
+    ("Aquarium", ["SHARK","TANK","FISH","REEF","CORAL","MARINE","WHALE","EEL"], 5),
+    ("Art class", ["PAINT","DRAW","CLAY","LINE","BRUSH","ARTIST","COLOR","INK"], 5),
+    ("Dance class", ["STEPS","TURN","LEAP","BEAT","MUSIC","DANCER","STAGE","TAP"], 5),
+    ("Book club", ["NOVEL","READ","PAGE","PLOT","STORY","AUTHOR","TITLE","INK"], 5),
+    ("Photography", ["PHOTO","LENS","SHOT","ZOOM","FLASH","CAMERA","IMAGE","PIC"], 5),
+    ("Tool box", ["DRILL","NAIL","BOLT","FILE","TOOLS","HAMMER","LEVEL","SAW"], 5),
+    ("Train station", ["TRACK","RAIL","SEAT","STOP","DEPOT","ENGINE","TRAIN","CAR"], 5),
+    ("On a bicycle", ["PEDAL","BIKE","GEAR","ROAD","CHAIN","CYCLER","BRAKE","AIR"], 5),
+    ("Pool day", ["FLOAT","DIVE","LANE","DEEP","WATER","SPLASH","TOWEL","SUN"], 5),
+    ("Bee hive", ["HONEY","BUZZ","WING","HIVE","QUEEN","WORKER","SWARM","BEE"], 5),
+    ("Cat nap", ["KITTY","PURR","PAWS","NAPS","WHISK","FELINE","CLAWS","CAT"], 5),
+    ("Dinosaur dig", ["BONES","BONE","ROCK","DIGS","TEETH","FOSSIL","CLAWS","EGG"], 5),
+    ("Robot lab", ["ROBOT","CODE","WIRE","GEAR","METAL","DROIDS","LASER","BOT"], 5),
+    ("Science lab", ["FLASK","ATOM","TEST","DATA","LASER","BEAKER","PROBE","LAB"], 5),
+    ("Music room", ["PIANO","NOTE","DRUM","SONG","SOUND","GUITAR","VOICE","JAM"], 5),
+    ("Library visit", ["BOOKS","READ","PAGE","DESK","STORY","NOVELS","SHELF","INK"], 5),
+    ("Writing desk", ["PAPER","PENS","NOTE","WORD","DRAFT","PENCIL","ERASE","INK"], 5),
+    ("Painting", ["BRUSH","BLUE","TONE","LINE","PAINT","CANVAS","COLOR","ART"], 5),
+    ("Pottery", ["GLAZE","KILN","BOWL","MUGS","SHAPE","POTTER","CLAYS","ART"], 5),
+    ("Woodworking", ["BOARD","SAWS","NAIL","SAND","TOOLS","CARVER","GRAIN","OAK"], 5),
+    ("Garage work", ["MOTOR","TIRE","JACK","OILS","TOOLS","GARAGE","LEVEL","CAR"], 5),
+    ("Car wash", ["SOAPY","WASH","HOSE","WAXY","SHINE","RINSED","TOWEL","CAR"], 5),
+    ("Pizza night", ["SLICE","OVEN","HERB","MEAT","SAUCE","PIZZAS","DOUGH","PIE"], 5),
+    ("Ice cream shop", ["SCOOP","CONE","MINT","COLD","CREAM","SUNDAE","FUDGE","CUP"], 5),
+    ("Candy shop", ["SWEET","MINT","GUMS","SOUR","FUDGE","SUGARY","TAFFY","POP"], 5),
+    ("Tea time", ["HONEY","MINT","CUPS","WARM","LEMON","TEAPOT","SUGAR","TEA"], 5),
 ]
 _WEAVE_PATHS = [
     [1,2,3,4,5],
@@ -162,9 +216,9 @@ def _weave_transform(path, variant):
     return out
 
 def weave_for_date(day):
-    # 100 deterministic daily boards: authored themed answer sets are paired
-    # with multiple valid grid orientations so the board itself also varies.
-    board_index = day.toordinal() % 100
+    # Hundreds of deterministic daily boards: authored themed answer sets are
+    # paired with five validated grid orientations so themes and layouts vary.
+    board_index = day.toordinal() % (len(_WEAVE_SETS) * 5)
     clue, words, thread_index = _WEAVE_SETS[board_index % len(_WEAVE_SETS)]
     variant = (board_index // len(_WEAVE_SETS)) % 5
     paths = [_weave_transform(path, variant) for path in _WEAVE_PATHS]
