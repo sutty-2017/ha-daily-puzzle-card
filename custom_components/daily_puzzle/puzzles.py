@@ -493,13 +493,19 @@ def _weave_transform(path, variant):
     return out
 
 def weave_for_date(day):
-    # Theme-first rotation: every authored theme is used once before any theme
-    # repeats with another board orientation. Layout is deliberately secondary
-    # so consecutive days are driven by content rather than shuffled geometry.
-    theme_count = len(_WEAVE_SETS)
-    cycle_index = day.toordinal()
-    theme_index = cycle_index % theme_count
-    variant = (cycle_index // theme_count) % 5
+    from datetime import date
+    # Preserve the released v0.3.3 mapping for existing dates. New dates use
+    # theme-first rotation so all 300 themes appear before a layout repeats.
+    if day < date(2026, 10, 6):
+        board_index = day.toordinal() % 100
+        theme_count = 21
+        theme_index = board_index % theme_count
+        variant = (board_index // theme_count) % 5
+    else:
+        theme_count = len(_WEAVE_SETS)
+        cycle_index = (day - date(2026, 10, 6)).days
+        theme_index = cycle_index % theme_count
+        variant = (cycle_index // theme_count) % 5
     clue, words, thread_index = _WEAVE_SETS[theme_index]
     paths = [_weave_transform(path, variant) for path in _WEAVE_PATHS]
     letters = [""] * 36
@@ -522,7 +528,12 @@ def word_for_date(day, length=5):
     if holiday and length == 5:
         return _HOLIDAY_WORDS[holiday]
     words = WORD_PUZZLES.get(length, WORD_PUZZLES[5])
-    return words[(day.toordinal() * 17 + length * 31) % len(words)]
+    from datetime import date
+    if length == 5 and day < date(2026, 10, 6):
+        words = words[:70]
+        return words[(day.toordinal() * 17 + length * 31) % len(words)]
+    cycle = (day - date(2026, 10, 6)).days if day >= date(2026, 10, 6) else day.toordinal()
+    return words[(cycle * 17 + length * 31) % len(words)]
 
 def word_lengths_for_date(day):
     return {length: word_for_date(day, length) for length in sorted(WORD_PUZZLES)}
