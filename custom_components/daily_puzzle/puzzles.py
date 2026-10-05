@@ -154,8 +154,8 @@ _HOLIDAY_WEAVES = {
 "thanksgiving":("Thanksgiving",["FEAST","YAMS","CORN","TART","GRAVY","TURKEY","THANK","PIE"],5),
 "christmas":("Christmas",["HOLLY","GIFT","STAR","BELL","ANGEL","WREATH","SANTA","JOY"],5),
 "valentines":("Valentine's Day",["HEART","LOVE","ROSE","DATE","CANDY","KISSES","CUPID","HUG"],5),
-"st_patricks":("St. Patrick's Day",["GREEN","LUCK","HARP","IRISH","CHARM","CLOVER","LEAFY","JIG"],5),
-"halloween":("Halloween",["GHOST","MASK","DARK","BOO!","WITCH","CANDLE","TREAT","BOO"],5),
+"st_patricks":("St. Patrick's Day",["GREEN","LUCK","HARP","EIRE","CHARM","CLOVER","LEAFY","JIG"],5),
+"halloween":("Halloween",["GHOST","MASK","DARK","CAPE","WITCH","CANDLE","TREAT","BOO"],5),
 }
 
 _HOLIDAY_GROUPS = {
