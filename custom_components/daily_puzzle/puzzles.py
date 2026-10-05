@@ -104,6 +104,58 @@ _GROUP_SOURCE = [group for board in GROUP_PUZZLES for group in board]
 _GROUP_BOARD_INDEXES = [[16,21,23,50],[11,17,30,44],[15,18,32,53],[9,22,27,52],[8,15,45,50],[19,20,22,49],[10,23,29,40],[0,7,18,37],[3,38,49,52],[7,21,24,50],[4,11,41,54],[2,21,31,48],[28,38,41,51],[15,18,21,32],[6,11,25,36],[19,22,49,52],[8,26,31,45],[11,12,17,54],[10,16,21,55],[19,22,41,52],[13,15,40,50],[9,14,43,44],[2,32,39,53],[17,27,28,46],[7,16,29,42],[12,46,49,51],[25,27,46,52],[2,29,48,55],[4,14,35,41],[8,18,45,55],[14,19,41,44],[0,23,26,29],[18,21,24,55],[12,14,17,43],[0,15,21,26],[3,20,22,49],[8,13,31,34],[17,28,43,54],[15,24,42,45],[19,20,22,41],[25,43,46,52],[0,21,26,55],[22,36,41,51],[0,26,29,39],[4,43,49,54],[7,8,26,53],[17,20,35,54],[8,26,45,55],[3,12,14,33],[26,32,39,45],[1,4,11,30],[0,42,47,53],[1,12,22,51],[0,5,10,47],[9,27,30,36],[0,34,37,55],[17,20,35,46],[15,24,26,53],[12,19,49,54],[0,15,18,53],[17,28,30,51],[5,7,10,32],[22,25,27,52],[5,7,10,48],[6,17,44,51],[4,9,46,51],[26,29,40,47],[17,22,27,52],[25,30,43,44],[5,18,24,31],[38,41,51,52],[8,13,31,50],[3,6,49,52],[7,24,29,34],[1,19,30,44],[16,26,39,45],[14,41,43,52],[18,31,37,48],[11,30,49,52],[13,26,47,48],[6,25,27,28],[27,33,36,46],[15,16,21,26],[36,41,43,46],[3,25,28,54],[31,32,42,45],[12,19,25,38],[2,24,31,45],[6,33,36,43],[2,23,32,45],[1,14,28,35],[0,37,50,55],[1,14,27,52],[31,40,50,53],[6,17,35,52],[0,37,47,50],[2,15,24,29],[21,34,48,55],[4,14,27,49],[0,15,21,34],[24,34,39,53],[9,22,28,51],[7,13,34,40],[22,33,43,52],[15,16,18,53],[17,19,46,52],[34,45,47,48],[16,29,31,50],[3,25,36,38],[2,8,23,37],[16,26,31,37],[12,14,25,27],[0,7,10,13],[4,9,22,27],[16,39,50,53],[2,5,8,23],[13,15,26,48],[14,19,28,33],[15,16,34,37],[1,28,38,51],[10,13,31,48],[2,5,31,40],[13,24,26,39],[11,25,36,46],[18,23,40,45],[14,25,27,52],[1,27,38,44],[13,16,23,42],[14,36,41,43],[0,2,5,7],[2,16,29,31],[6,19,41,52],[11,36,38,41],[0,15,18,21],[3,6,20,41],[18,24,37,39],[35,44,49,54],[13,24,26,47],[6,9,27,44],[7,13,16,34],[12,14,17,35],[0,2,7,45],[11,12,22,41],[2,7,32,37],[1,11,14,52],[0,5,31,42],[6,12,33,35],[23,29,32,34],[7,24,26,37],[9,28,38,43],[15,18,37,48],[4,11,14,25],[0,10,13,15],[9,36,38,51],[18,21,31,32],[0,2,5,15],[6,33,44,51],[13,23,26,32],[1,3,12,38],[11,25,38,52],[5,10,15,48],[19,25,44,54],[21,23,40,50],[6,19,28,33],[5,18,32,47],[11,30,36,49],[0,5,42,47],[20,33,43,46],[15,34,48,53],[3,14,17,44],[21,31,34,40],[30,43,49,52],[7,8,10,29],[11,22,25,52],[8,15,34,53],[4,11,22,33],[21,34,39,48],[12,35,46,49],[0,18,31,45],[17,35,36,38],[0,13,18,55],[1,12,19,30],[7,10,45,48],[17,36,51,54],[13,31,40,42],[9,11,14,36],[0,13,15,18],[15,37,48,50],[1,4,30,43],[8,13,18,31],[38,41,44,51],[16,23,29,34],[2,16,39,45],[25,27,36,46],[24,31,42,53],[6,11,17,44],[8,13,31,42],[11,22,44,49],[19,22,36,49],[21,31,32,50],[7,42,45,48],[4,19,30,41],[26,32,47,53],[1,28,30,51],[15,34,45,48],[3,20,25,54],[32,34,47,53],[11,30,41,52],[0,5,18,23],[9,30,36,51],[16,31,42,45],[11,17,46,52],[23,24,29,50],[2,15,37,48],[20,41,51,54],[13,15,34,48],[9,44,46,51],[13,32,39,42],[1,22,27,36],[15,26,32,45],[3,12,22,41],[8,15,26,53],[9,35,36,46],[13,16,39,42],[3,17,28,54],[21,32,42,47],[12,30,49,51],[2,5,15,16],[3,6,36,41],[0,5,26,55],[1,4,11,38],[2,16,23,45],[3,17,30,36],[1,3,6,28],[24,29,42,47],[0,10,13,31],[3,4,6,33],[0,26,39,45],[16,26,29,39],[6,19,44,49],[9,12,19,46],[7,18,29,40],[22,36,43,49],[0,2,5,39],[25,27,36,54],[18,39,45,48],[22,28,33,51],[0,50,53,55],[6,11,12,49],[40,42,47,53],[24,31,45,50],[25,28,43,54],[2,13,24,31],[25,38,43,44],[0,7,50,53],[25,30,36,51],[13,24,31,42],[14,35,41,44],[35,49,52,54],[7,32,34,45],[11,38,41,44],[8,21,42,47],[22,27,44,49],[24,34,37,47],[14,35,41,52],[10,47,48,53],[3,33,38,52],[0,2,13,23],[19,30,41,44],[16,26,29,47],[14,19,25,52],[8,21,31,42],[14,19,20,25],[13,39,48,50],[19,30,33,36],[15,16,42,45],[28,38,41,43],[32,39,50,53],[0,2,31,45],[23,26,37,48],[7,24,50,53],[3,17,22,52],[24,26,31,45],[12,22,35,41],[2,21,32,55],[19,41,44,46],[2,24,37,55],[1,28,30,43],[9,11,46,52],[13,15,48,50],[5,24,31,42],[6,12,41,51],[5,7,18,32],[19,20,22,33],[8,31,42,53],[6,12,43,49],[2,40,53,55],[27,44,49,54],[8,18,37,47],[1,12,35,38]]
 GROUP_PUZZLES = [[_GROUP_SOURCE[index] for index in indexes] for indexes in _GROUP_BOARD_INDEXES]
 
+
+# Special-date puzzle overrides. These use the actual calendar holiday date,
+# not an alternate federal employee "in lieu of" workday.
+def _nth_weekday(year, month, weekday, n):
+    from datetime import date, timedelta
+    first = date(year, month, 1)
+    return first + timedelta(days=(weekday - first.weekday()) % 7 + 7 * (n - 1))
+
+def _last_weekday(year, month, weekday):
+    from datetime import date, timedelta
+    next_month = date(year + (month == 12), 1 if month == 12 else month + 1, 1)
+    last = next_month - timedelta(days=1)
+    return last - timedelta(days=(last.weekday() - weekday) % 7)
+
+def holiday_for_date(day):
+    fixed = {(1,1):"new_year",(2,14):"valentines",(3,17):"st_patricks",(6,19):"juneteenth",(7,4):"independence",(10,31):"halloween",(11,11):"veterans",(12,25):"christmas"}
+    hit = fixed.get((day.month, day.day))
+    if hit:
+        return hit
+    moving = {
+        _nth_weekday(day.year,1,0,3):"mlk",
+        _nth_weekday(day.year,2,0,3):"presidents",
+        _last_weekday(day.year,5,0):"memorial",
+        _nth_weekday(day.year,9,0,1):"labor",
+        _nth_weekday(day.year,10,0,2):"columbus",
+        _nth_weekday(day.year,11,3,4):"thanksgiving",
+    }
+    return moving.get(day)
+
+_HOLIDAY_WORDS = {
+"new_year":"CLOCK","mlk":"DREAM","presidents":"CIVIC","memorial":"HONOR",
+"juneteenth":"UNITY","independence":"STARS","labor":"CRAFT","columbus":"OCEAN",
+"veterans":"HONOR","thanksgiving":"FEAST","christmas":"HOLLY",
+"valentines":"HEART","st_patricks":"GREEN","halloween":"GHOST",
+}
+_HOLIDAY_GROUPS = {
+"new_year":[("At midnight",["CLOCK","COUNTDOWN","KISS","CHEERS"]),("Fresh starts",["GOAL","PLAN","RESOLVE","BEGIN"]),("Party supplies",["HAT","HORN","CONFETTI","BALLOON"]),("Calendar words",["YEAR","MONTH","WEEK","DATE"])],
+"mlk":[("Community action",["SERVE","MARCH","VOTE","LEAD"]),("Values",["JUSTICE","PEACE","EQUALITY","UNITY"]),("Public speaking",["SPEECH","PODIUM","CROWD","MIC"]),("Ways to help",["GIVE","TEACH","LISTEN","BUILD"])],
+"presidents":[("White House",["OVAL","DESK","CABINET","EAST"]),("Election words",["VOTE","BALLOT","POLL","TICKET"]),("U.S. government",["SENATE","HOUSE","COURT","CONGRESS"]),("National symbols",["FLAG","EAGLE","SEAL","STARS"])],
+"memorial":[("Remembrance",["HONOR","MEMORY","TRIBUTE","WREATH"]),("Ceremony",["FLAG","SALUTE","SILENCE","BUGLE"]),("Military branches",["ARMY","NAVY","MARINES","AIRFORCE"]),("At a memorial",["STONE","NAME","FLOWERS","VISITOR"])],
+"juneteenth":[("Celebration",["MUSIC","PARADE","PICNIC","FESTIVAL"]),("Freedom",["LIBERTY","RIGHTS","CHOICE","VOICE"]),("Community",["FAMILY","FRIENDS","NEIGHBOR","UNITY"]),("Summer gathering",["PARK","FOOD","GAMES","DANCE"])],
+"independence":[("Fourth of July",["FIREWORKS","PARADE","PICNIC","FLAG"]),("Patriotic symbols",["EAGLE","STARS","STRIPES","LIBERTY"]),("Cookout",["GRILL","BURGER","CORN","MELON"]),("Night sky",["SPARK","BURST","GLOW","BOOM"])],
+"labor":[("On the job",["SHIFT","CLOCK","BREAK","PAY"]),("Tools",["HAMMER","DRILL","WRENCH","LEVEL"]),("Workplaces",["OFFICE","SHOP","SITE","PLANT"]),("Teamwork",["CREW","GROUP","PARTNER","LEADER"])],
+"columbus":[("Navigation",["MAP","COMPASS","CHART","BEARING"]),("At sea",["SHIP","SAIL","DECK","MAST"]),("Ocean travel",["VOYAGE","PORT","WAVE","HORIZON"]),("Explorer gear",["ROPE","CHEST","CLOAK","BOOTS"])],
+"veterans":[("Service",["DUTY","HONOR","COURAGE","SACRIFICE"]),("Military branches",["ARMY","NAVY","MARINES","AIRFORCE"]),("Ceremony",["FLAG","SALUTE","PARADE","SPEECH"]),("Uniform items",["BOOT","CAP","BADGE","MEDAL"])],
+"thanksgiving":[("On the table",["TURKEY","GRAVY","STUFFING","CRANBERRY"]),("Desserts",["PIE","CAKE","TART","COOKIE"]),("Harvest",["CORN","GOURD","APPLE","WHEAT"]),("Gathering",["FAMILY","FRIENDS","DINNER","THANKS"])],
+"christmas":[("Tree decorations",["LIGHTS","STAR","TINSEL","ORNAMENT"]),("Santa's trip",["SLEIGH","REINDEER","CHIMNEY","NORTH"]),("Wrapped up",["GIFT","BOX","BOW","PAPER"]),("Holiday treats",["COOKIE","COCOA","CANDY","GINGER"])],
+"valentines":[("Valentine gifts",["ROSES","CANDY","CARD","FLOWERS"]),("Terms of affection",["DEAR","HONEY","SWEETIE","LOVE"]),("Heart shapes",["LOCKET","COOKIE","BALLOON","CANDY"]),("Date night",["DINNER","MOVIE","DANCE","MUSIC"])],
+"st_patricks":[("Going green",["CLOVER","EMERALD","LIME","MOSS"]),("Lucky things",["HORSESHOE","RABBIT","PENNY","CLOVER"]),("Irish symbols",["HARP","SHAMROCK","GREEN","CELTIC"]),("Parade day",["MARCH","FLOAT","MUSIC","CROWD"])],
+"halloween":[("Costumes",["WITCH","GHOST","VAMPIRE","PIRATE"]),("Trick-or-treat",["CANDY","BAG","DOORBELL","PORCH"]),("Spooky places",["CRYPT","ATTIC","CELLAR","GRAVEYARD"]),("Pumpkin carving",["KNIFE","SEEDS","CANDLE","FACE"])],
+}
+
 # Word Weave boards use a 6x6 grid. Answers are arranged as adjacent paths;
 # every cell belongs to exactly one answer, and the Theme Thread spans top to bottom.
 _WEAVE_SETS = [
@@ -463,12 +515,18 @@ def game_for_date(day, enabled_games=None):
     return games[(day.toordinal() * 17 + 7) % len(games)]
 
 def word_for_date(day, length=5):
-    words = WORD_PUZZLES.get(int(length), WORD_PUZZLES[5])
-    # Give every length its own stable daily answer rather than the same list offset.
-    return words[(day.toordinal() * 17 + int(length) * 31) % len(words)]
+    length = int(length)
+    holiday = holiday_for_date(day)
+    if holiday and length == 5:
+        return _HOLIDAY_WORDS[holiday]
+    words = WORD_PUZZLES.get(length, WORD_PUZZLES[5])
+    return words[(day.toordinal() * 17 + length * 31) % len(words)]
 
 def word_lengths_for_date(day):
     return {length: word_for_date(day, length) for length in sorted(WORD_PUZZLES)}
 
 def groups_for_date(day):
+    holiday = holiday_for_date(day)
+    if holiday in _HOLIDAY_GROUPS:
+        return [{"label": label, "words": words} for label, words in _HOLIDAY_GROUPS[holiday]]
     return GROUP_PUZZLES[day.toordinal() % len(GROUP_PUZZLES)]
