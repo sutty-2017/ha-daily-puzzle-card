@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from itertools import combinations
-
 from .const import DEFAULT_ENABLED_GAMES
 
 WORD_PUZZLES = {
