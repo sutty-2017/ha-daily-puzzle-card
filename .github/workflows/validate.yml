@@ -1,0 +1,20 @@
+name: Validate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile Python sources
+        run: python -m py_compile custom_components/daily_puzzle/*.py
+      - name: Check frontend for forbidden timeout rerenders
+        run: |
+          if grep -n "setTimeout.*render\|setTimeout.*play" custom_components/daily_puzzle/www/daily-puzzle-card.js; then
+            echo "Found timeout-driven rerender"
+            exit 1
+          fi

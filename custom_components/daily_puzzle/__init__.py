@@ -440,6 +440,36 @@ class DailyPuzzleManager:
         await self.async_save()
 
 
+    async def async_reveal_answer(self) -> None:
+        """Reveal the solution after a failed attempt without awarding completion."""
+        await self.async_rollover()
+        if self.state.get("status") != "failed":
+            return
+        day = date.fromisoformat(self.state["date"])
+        game_state = dict(self.state.get("game_state") or {})
+        if self.state["game"] == "word_grid":
+            length = int(game_state.get("word_length") or 0)
+            if length not in (3, 4, 5, 6, 7):
+                return
+            game_state["revealed_answer"] = word_for_date(day, length)
+        elif self.state["game"] == "four_of_a_kind":
+            game_state["revealed_groups"] = [
+                {"label": group["label"], "words": list(group["words"])}
+                for group in groups_for_date(day)
+            ]
+        elif self.state["game"] == "word_weave":
+            puzzle = weave_for_date(day)
+            game_state["revealed_words"] = [
+                {"word": item["word"], "path": list(item["path"]), "thread": bool(item["thread"])}
+                for item in puzzle["words"]
+            ]
+        else:
+            return
+        game_state["answer_revealed"] = True
+        self.state["game_state"] = game_state
+        await self.async_save()
+
+
     async def async_use_hint(self) -> None:
         await self.async_rollover()
         if not self.hints_enabled or self.state.get("status") in ("solved", "failed"):
@@ -558,6 +588,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     async def use_hint(call: ServiceCall) -> None:
         await manager.async_use_hint()
 
+    async def reveal_answer(call: ServiceCall) -> None:
+        await manager.async_reveal_answer()
+
     hass.services.async_register(DOMAIN, "submit_word", submit_word, schema=vol.Schema({vol.Required("guess"): cv.string}))
     hass.services.async_register(DOMAIN, "submit_group", submit_group, schema=vol.Schema({vol.Required("words"): vol.All(cv.ensure_list, [cv.string])}))
     hass.services.async_register(DOMAIN, "submit_weave", submit_weave, schema=vol.Schema({vol.Required("path"): vol.All(cv.ensure_list, [vol.Coerce(int)])}))
@@ -566,6 +599,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hass.services.async_register(DOMAIN, "admin_switch_game", admin_switch_game, schema=vol.Schema({vol.Required("game"): vol.In(GAME_NAMES)}))
     hass.services.async_register(DOMAIN, "return_to_daily", return_to_daily)
     hass.services.async_register(DOMAIN, "use_hint", use_hint)
+    hass.services.async_register(DOMAIN, "reveal_answer", reveal_answer)
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     hass.async_create_task(_async_register_frontend(hass))
@@ -578,7 +612,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         if manager:
             manager.stop_timers()
         hass.data.pop(DATA_KEY, None)
-        for service in ("submit_word", "submit_group", "submit_weave", "replay", "admin_reset", "admin_switch_game", "return_to_daily", "use_hint"):
+        for service in ("submit_word", "submit_group", "submit_weave", "replay", "admin_reset", "admin_switch_game", "return_to_daily", "use_hint", "reveal_answer"):
             hass.services.async_remove(DOMAIN, service)
     return unloaded
 

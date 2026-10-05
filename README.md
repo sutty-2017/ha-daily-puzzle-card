@@ -2,7 +2,7 @@
 
 A shared daily puzzle integration and companion dashboard card for Home Assistant. One household puzzle is selected each day, progress is shared across dashboards, and Home Assistant entities expose completion and stats for automations and dashboard visibility rules.
 
-> **Current release: v0.3.3**
+> **Current release: v0.4.0**
 
 This project is experimental, intended for personal/community use, and developed with AI assistance.
 
@@ -12,14 +12,16 @@ This project is experimental, intended for personal/community use, and developed
 A daily word-guessing game with configurable **3–7 letter** answers and six guesses. Optional hints can reveal letters, and the bundled library now contains hundreds of answers across the supported lengths.
 
 ### Four of a Kind
-Find four groups of four related words. The game supports configurable mistake limits, two-stage hints, custom solved-group colors, and a **100-board** daily rotation.
+Find four groups of four related words. The game supports configurable mistake limits, two-stage hints, custom solved-group colors, and a **300-board** daily rotation backed by a much larger authored category bank.
 
 ### Word Weave
-Trace themed words through neighboring letters in a 6×6 grid, including diagonal connections. Every cell belongs to an answer and each board includes a special **Theme Thread** spanning the grid. v0.3.3 includes a **100-board deterministic rotation** built from locally bundled themed puzzle sets and validated grid orientations.
+Trace themed words through neighboring letters in a 6×6 grid, including diagonal connections. Every cell belongs to an answer and each board includes a special **Theme Thread** spanning the grid. v0.4.0 includes **300 authored themes** with theme-first deterministic rotation and validated grid orientations.
 
 ## Highlights
 
 - Three daily games: **Word Grid, Four of a Kind, and Word Weave**
+- **Reveal Answer** after a failed attempt without awarding solve credit
+- Special puzzles for major U.S. holidays and popular cultural dates across all three games
 - Choose which games participate in the daily rotation
 - Shared, persistent household progress across Home Assistant clients
 - Compact dashboard card that fills its available card height and opens a large play popup
