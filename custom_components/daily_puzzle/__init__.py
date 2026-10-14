@@ -602,12 +602,18 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hass.services.async_register(DOMAIN, "reveal_answer", reveal_answer)
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
-    hass.async_create_task(_async_register_frontend(hass))
+    await _async_register_frontend(hass)
     return True
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     unloaded = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
     if unloaded:
+        listener = hass.data.pop(f"{DOMAIN}_frontend_start_listener", None)
+        if listener:
+            listener()
+        task = hass.data.pop(f"{DOMAIN}_frontend_task", None)
+        if task and not task.done():
+            task.cancel()
         manager = hass.data.get(DOMAIN, {}).pop(entry.entry_id, None)
         if manager:
             manager.stop_timers()
@@ -667,7 +673,30 @@ async def _async_register_frontend(hass: HomeAssistant) -> None:
                 await asyncio.sleep(2)
         _LOGGER.warning("Could not automatically register Daily Puzzle card. Add %s as a module resource if needed.", _CARD_URL)
 
-    task = hass.async_create_task(_register_with_retries())
-    hass.data[task_key] = task
-    task.add_done_callback(lambda _future: hass.data.pop(task_key, None))
-    hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STARTED, lambda _event: hass.async_create_task(_register_with_retries()))
+    @callback
+    def _on_started(_event) -> None:
+        hass.data.pop(f"{DOMAIN}_frontend_start_listener", None)
+        _schedule_registration()
+
+    @callback
+    def _schedule_registration() -> None:
+        if hass.data.get(done_key):
+            return
+        current = hass.data.get(task_key)
+        if current and not current.done():
+            return
+        task = hass.async_create_task(_register_with_retries())
+        hass.data[task_key] = task
+
+        @callback
+        def _clear_task(_future) -> None:
+            if hass.data.get(task_key) is task:
+                hass.data.pop(task_key, None)
+
+        task.add_done_callback(_clear_task)
+
+    _schedule_registration()
+    if not hass.is_running and f"{DOMAIN}_frontend_start_listener" not in hass.data:
+        hass.data[f"{DOMAIN}_frontend_start_listener"] = hass.bus.async_listen_once(
+            EVENT_HOMEASSISTANT_STARTED, _on_started
+        )
