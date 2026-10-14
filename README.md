@@ -2,7 +2,7 @@
 
 A shared daily puzzle integration and companion dashboard card for Home Assistant. One household puzzle is selected each day, progress is shared across dashboards, and Home Assistant entities expose completion and stats for automations and dashboard visibility rules.
 
-> **Current release: v0.4.0**
+> **Current release: v0.4.1**
 
 This project is experimental, intended for personal/community use, and developed with AI assistance.
 
@@ -39,6 +39,12 @@ Trace themed words through neighboring letters in a 6×6 grid, including diagona
 - Bundled card is automatically served and registered by the integration
 - Local deterministic puzzle selection; no puzzle API, AI service, account, or API key required
 - Rendering is designed to preserve in-progress input and selections during unrelated Home Assistant updates
+
+## v0.4.1 stability fix
+
+- Fix a Home Assistant startup thread-safety violation in automatic frontend registration.
+- Use one managed resource-registration retry task and cancel it on integration unload.
+- Preserve puzzle entities, saved progress, streaks, completion, and admin behavior.
 
 ## Installation
 

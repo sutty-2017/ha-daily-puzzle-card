@@ -10,7 +10,6 @@ import voluptuous as vol
 from homeassistant.components.http import StaticPathConfig
 from homeassistant.components.lovelace.const import LOVELACE_DATA
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import EVENT_HOMEASSISTANT_STARTED
 from homeassistant.core import HomeAssistant, ServiceCall, callback
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.event import async_track_time_interval, async_track_utc_time_change
@@ -602,7 +601,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hass.services.async_register(DOMAIN, "reveal_answer", reveal_answer)
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
-    hass.async_create_task(_async_register_frontend(hass))
+    await _async_register_frontend(hass)
     return True
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -612,6 +611,9 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         if manager:
             manager.stop_timers()
         hass.data.pop(DATA_KEY, None)
+        task = hass.data.pop(f"{DOMAIN}_frontend_task", None)
+        if task is not None and not task.done():
+            task.cancel()
         for service in ("submit_word", "submit_group", "submit_weave", "replay", "admin_reset", "admin_switch_game", "return_to_daily", "use_hint", "reveal_answer"):
             hass.services.async_remove(DOMAIN, service)
     return unloaded
@@ -667,7 +669,14 @@ async def _async_register_frontend(hass: HomeAssistant) -> None:
                 await asyncio.sleep(2)
         _LOGGER.warning("Could not automatically register Daily Puzzle card. Add %s as a module resource if needed.", _CARD_URL)
 
+    # Setup runs on HA's event loop. A single managed retry task is enough:
+    # it waits for Lovelace availability whether HA is starting or already up.
     task = hass.async_create_task(_register_with_retries())
     hass.data[task_key] = task
-    task.add_done_callback(lambda _future: hass.data.pop(task_key, None))
-    hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STARTED, lambda _event: hass.async_create_task(_register_with_retries()))
+
+    @callback
+    def _clear_registration_task(finished: asyncio.Task) -> None:
+        if hass.data.get(task_key) is finished:
+            hass.data.pop(task_key, None)
+
+    task.add_done_callback(_clear_registration_task)
