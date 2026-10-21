@@ -40,6 +40,12 @@ Trace themed words through neighboring letters in a 6×6 grid, including diagona
 - Local deterministic puzzle selection; no puzzle API, AI service, account, or API key required
 - Rendering is designed to preserve in-progress input and selections during unrelated Home Assistant updates
 
+## Upcoming hybrid visual refresh (draft PR #20)
+
+The optional **Hybrid glass + playful popup** card setting adds a translucent frosted-glass dashboard appearance and a richer dark, warm-accented game popup. Enable it in the Daily Puzzle card visual editor after installing a release that contains the feature. It is **off by default**, preserving existing card appearances. It changes presentation only: puzzle logic, shared progress, streaks, replay, admin/test mode, and all Home Assistant entities remain unchanged.
+
+**Release status:** pending wall-panel and gameplay regression review. Do not publish from the feature branch until checks pass.
+
 ## v0.4.1 stability fix
 
 - Fix a Home Assistant startup thread-safety violation in automatic frontend registration.
