@@ -1,0 +1,18 @@
+name: Validate frontend card
+on:
+  push:
+    branches:
+      - main
+      - feature/hybrid-puzzle-card-redesign
+  pull_request:
+
+jobs:
+  javascript-syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check Daily Puzzle card JavaScript syntax
+        run: node --check custom_components/daily_puzzle/www/daily-puzzle-card.js
