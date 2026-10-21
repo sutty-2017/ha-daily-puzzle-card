@@ -26,9 +26,9 @@ class DailyPuzzleCard extends HTMLElement{
   let vars=this.vars();
   this._portal=document.createElement("div");
   this._portal.className="daily-puzzle-portal";
-  this._portal.setAttribute("style",vars);this._portal.classList.toggle("hybrid",!!this.c.hybrid_style);
+  this._portal.setAttribute("style",vars+";position:fixed!important;inset:0!important;z-index:2147483647!important;display:block!important;pointer-events:auto!important;");this._portal.classList.toggle("hybrid",!!this.c.hybrid_style);
   this._portal.innerHTML='<style>'+this.css()+'</style><div class="ov"><div class="modal" role="dialog" aria-modal="true"><div class="head"><div><b>'+this.c.title+'</b><small style="display:block">'+this.game()+'</small></div><button class="x" id="x"><ha-icon icon="mdi:window-minimize"></ha-icon></button></div><div class="body" id="body"></div></div></div>';
-  document.body.appendChild(this._portal);
+  document.body.appendChild(this._portal);this._portal.querySelector(".ov").style.cssText="position:absolute!important;inset:0!important;z-index:1!important;display:grid!important;place-items:center!important;background:rgba(0,0,0,.7)!important;";
   this._portal.querySelector("#x").onclick=()=>this.close();
   this._portal.querySelector(".ov").onclick=e=>{if(e.target.classList.contains("ov"))this.close()};
   this._portal.addEventListener("touchmove",e=>e.stopPropagation(),{passive:true});
