@@ -615,7 +615,10 @@ def game_for_date(day, enabled_games=None):
     games = [game for game in (enabled_games or DEFAULT_ENABLED_GAMES) if game in DEFAULT_ENABLED_GAMES]
     if not games:
         games = list(DEFAULT_ENABLED_GAMES)
-    return games[(day.toordinal() * 17 + 7) % len(games)]
+    # Stable pseudo-random daily choice, shared by all clients and restarts.
+    import hashlib
+    seed = hashlib.sha256(f"daily-puzzle-game-v2:{day.isoformat()}".encode()).digest()
+    return games[int.from_bytes(seed[:8], "big") % len(games)]
 
 def word_for_date(day, length=5):
     length = int(length)
