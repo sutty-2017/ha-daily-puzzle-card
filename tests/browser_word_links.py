@@ -19,19 +19,19 @@ def payload():
 calls=[]
 fail_next=False
 
-def service(name, data):
+async def service(name, data):
     global fail_next
     calls.append((name,data))
     if fail_next:
         fail_next=False
         raise RuntimeError('Simulated connection failure')
-    if name=='submit_link': asyncio.run(m.async_submit_link(data['guess'],data['date'],data['index'],data['revision']))
-    elif name=='use_hint': asyncio.run(m.async_use_hint())
-    elif name=='replay': asyncio.run(m.async_replay())
-    elif name=='admin_switch_game': asyncio.run(m.async_admin_switch_game(data['game']))
-    elif name=='admin_reset': asyncio.run(m.async_admin_reset())
-    elif name=='return_to_daily': asyncio.run(m.async_return_to_daily())
-    elif name=='reveal_answer': asyncio.run(m.async_reveal_answer())
+    if name=='submit_link': await m.async_submit_link(data['guess'],data['date'],data['index'],data['revision'])
+    elif name=='use_hint': await m.async_use_hint()
+    elif name=='replay': await m.async_replay()
+    elif name=='admin_switch_game': await m.async_admin_switch_game(data['game'])
+    elif name=='admin_reset': await m.async_admin_reset()
+    elif name=='return_to_daily': await m.async_return_to_daily()
+    elif name=='reveal_answer': await m.async_reveal_answer()
     return payload()
 
 with sync_playwright() as pw:
