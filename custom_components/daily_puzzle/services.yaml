@@ -41,6 +41,10 @@ admin_switch_game:
               value: word_grid
             - label: Four of a Kind
               value: four_of_a_kind
+            - label: Word Weave
+              value: word_weave
+            - label: Word Links
+              value: word_links
 
 return_to_daily:
   name: Return to daily puzzle
@@ -62,3 +66,29 @@ submit_weave:
 reveal_answer:
   name: Reveal failed puzzle answer
   description: Reveal the solution after a failed attempt without awarding completion or changing statistics.
+
+submit_link:
+  name: Submit Word Links answer
+  description: Guess the next word. Date, index, and revision must match the current shared board.
+  fields:
+    guess:
+      required: true
+      selector:
+        text:
+    date:
+      required: true
+      selector:
+        text:
+    index:
+      required: true
+      selector:
+        number:
+          min: 1
+          max: 6
+          mode: box
+    revision:
+      required: true
+      selector:
+        number:
+          min: 0
+          mode: box

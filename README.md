@@ -2,7 +2,7 @@
 
 A shared daily puzzle integration and companion dashboard card for Home Assistant. One household puzzle is selected each day, progress is shared across dashboards, and Home Assistant entities expose completion and stats for automations and dashboard visibility rules.
 
-> **Current release: v0.4.1**
+> **Prepared version: v0.6.0 — Word Links (review branch; not yet released)**
 
 This project is experimental, intended for personal/community use, and developed with AI assistance.
 
@@ -17,11 +17,20 @@ Find four groups of four related words. The game supports configurable mistake l
 ### Word Weave
 Trace themed words through neighboring letters in a 6×6 grid, including diagonal connections. Every cell belongs to an answer and each board includes a special **Theme Thread** spanning the grid. v0.4.0 includes **300 authored themes** with theme-first deterministic rotation and validated grid orientations.
 
+### Word Links
+Work down a seven-word chain. Each neighboring pair makes a compound word or familiar phrase (BIRD → HOUSE → PLANT → FOOD). The first word is shown; the remaining words show their first letter and length. Guess each word in order using a physical keyboard or the touch keyboard.
+
+- **220 bundled regular boards**, with 220 distinct starting words, plus **14 holiday boards** covering the same dates as the other games.
+- Two optional hints per chain, each revealing the next letter of the current word. Six incorrect answers end the official attempt; answer reveal and replay work like the other games.
+- Shared progress, saved completed board, streaks, no-hint solves, and Admin/Test Mode use the existing integration behavior.
+- Each chain is selected from explicitly authored phrase links; the frozen library and its reproducible authoring tool are included. Full chains are unique; chains may share individual links. The content is local and uses no external service.
+- Only the stored target answer advances the chain. Check both neighboring clues when more than one familiar phrase could fit.
+
 ## Highlights
 
-- Three daily games: **Word Grid, Four of a Kind, and Word Weave**
+- Four daily games: **Word Grid, Four of a Kind, Word Weave, and Word Links**
 - **Reveal Answer** after a failed attempt without awarding solve credit
-- Special puzzles for major U.S. holidays and popular cultural dates across all three games
+- Special puzzles for major U.S. holidays and popular cultural dates across all four games
 - Choose which games participate in the daily rotation
 - Shared, persistent household progress across Home Assistant clients
 - Compact dashboard card that fills its available card height and opens a large play popup
@@ -94,7 +103,11 @@ This keeps presentation policy in Home Assistant: another household may prefer t
 
 ## How daily puzzles work
 
-The integration chooses the game and bundled puzzle deterministically from Home Assistant's local date. The backend owns puzzle answers, validation, shared progress, daily rollover, completion, and statistics. The card is the presentation layer.
+The integration chooses the game using a stable hash of Home Assistant's local date. All enabled games have an equal opportunity to be selected, and the same game can appear on consecutive days. Every dashboard sees the same choice, including after restart. This replaces the previous fixed game cycle. The selected game's holiday board takes precedence on supported holiday dates; holidays do not force a particular game.
+
+On upgrade, an existing selection containing all three original games automatically includes Word Links. A deliberately restricted selection is preserved; add Word Links from **Settings → Devices & services → Daily Puzzle → Configure → Puzzle settings**. The stored board for today is preserved. New random selection takes effect at the next rollover (or an explicit reset).
+
+The bundled puzzle is also selected deterministically from the local date. The backend owns puzzle answers, validation, shared progress, daily rollover, completion, and statistics. The card is the presentation layer.
 
 All puzzle content is bundled locally. The card's countdown animates once per second in the browser while the Home Assistant time-remaining entity updates much less frequently, avoiding unnecessary recorder/state traffic just to animate seconds.
 
@@ -104,7 +117,7 @@ After the first official solve, the original completed board is retained. Pressi
 
 Replay never turns the Completed sensor back off, removes the original completion, increments Puzzles solved again, or changes the day's streak credit.
 
-**Admin/Test Mode** lets you switch among Word Grid, Four of a Kind, and Word Weave and reset the test board for development or casual play. Test-mode activity does not affect the official daily completion, streak, solved totals, or no-hint totals. Returning to Today restores the real daily state.
+**Admin/Test Mode** lets you switch among Word Grid, Four of a Kind, Word Weave, and Word Links and reset the test board for development or casual play. Test-mode activity does not affect the official daily completion, streak, solved totals, or no-hint totals. Returning to Today restores the real daily state.
 
 ## Privacy and network use
 
@@ -113,3 +126,11 @@ Daily Puzzle does not require an external puzzle server, account, AI API, or API
 ## Disclaimer
 
 This is an independent Home Assistant community project. It is not affiliated with or endorsed by The New York Times, Wordle, Connections, Strands, Home Assistant, or Nabu Casa. Game mechanics may be inspired by familiar word-puzzle formats, but puzzle content, game names, and presentation are original to this project.
+
+## Development checks
+
+Run `python -m unittest discover -s tests -v`, `node --check custom_components/daily_puzzle/www/daily-puzzle-card.js`, and `node tests/word_links_dom.cjs` (requires jsdom 26). The tests exercise content structure, holiday coverage, random selection, progress, credit accounting, upgrade preservation, other-game completion, and DOM input handling.
+
+`python tests/browser_word_links.py` is a separate real-browser smoke check requiring Playwright and Chromium. Run it and check physical wall-panel layout before release. Browser execution was blocked by socket restrictions in the implementation environment; DOM tests are not a substitute for visual verification.
+
+`python scripts/build_word_links.py` reproduces `word_links.json` from the explicitly authored link bank. Normal builds do not regenerate content. Review any future content changes carefully: changing board order or selection can change answers for an in-progress date.

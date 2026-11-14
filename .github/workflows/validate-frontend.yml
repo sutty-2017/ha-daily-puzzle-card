@@ -16,3 +16,7 @@ jobs:
           node-version: '22'
       - name: Check Daily Puzzle card JavaScript syntax
         run: node --check custom_components/daily_puzzle/www/daily-puzzle-card.js
+      - name: Install DOM test dependency
+        run: npm install --prefix /tmp/daily-puzzle-tests --no-audit --no-fund jsdom@26.1.0
+      - name: Check card interactions
+        run: NODE_PATH=/tmp/daily-puzzle-tests/node_modules node tests/word_links_dom.cjs

@@ -9,10 +9,12 @@ STORAGE_KEY = "daily_puzzle"
 GAME_WORD_GRID = "word_grid"
 GAME_FOUR_OF_A_KIND = "four_of_a_kind"
 GAME_WORD_WEAVE = "word_weave"
+GAME_WORD_LINKS = "word_links"
 GAME_NAMES = {
     GAME_WORD_GRID: "Word Grid",
     GAME_FOUR_OF_A_KIND: "Four of a Kind",
     GAME_WORD_WEAVE: "Word Weave",
+    GAME_WORD_LINKS: "Word Links",
 }
 DEFAULT_ENABLED_GAMES = list(GAME_NAMES)
 CONF_ENABLED_GAMES = "enabled_games"
